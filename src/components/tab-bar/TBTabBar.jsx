@@ -8,12 +8,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import Context from '../Context';
-import { HBox } from '../Boxs';
-import { TabBarItem, TabBarItemCenter } from './TabBarItem';
+import { TabBar } from 'saltui';
+import { TabBarItem } from 'saltui/lib/TabBar';
+import { Boxs } from 'saltui/lib/Boxs';
 
-class TabBar extends React.Component {
-  static displayName = 'TabBar';
+import Context  from 'saltui/lib/Context';
+
+import { TBTabBarCenter } from './TBTabBarCenter';
+
+const HBox = Boxs;
+
+class TBTabBar extends TabBar {
+
+ static displayName = 'TabBar';
 
   static propTypes = {
     className: PropTypes.string,
@@ -90,69 +97,15 @@ class TabBar extends React.Component {
   * Tab bar items data from child React Element
   * like: <TabBar><TabBar.Item></TabBar.Item></TabBar> Render way
   */
-  childrenRenderWay() {
-    const t = this;
-    return React.Children.map(this.props.children, (child, idx) => {
-      if (!child) {
-        return null;
-      }
-      if (child.props.items) {
-        t.centerTabIndex = idx;
-        return (
-          <TabBarItemCenter
-            key={idx}
-            index={idx}
-            item={child}
-            moreVisible={this.state.centerMoreVisible}
-            iconHeight={child.cIconHeight || t.props.cIconHeight}
-            onMoreVisibleChange={(visible) => { this.handleCenterMoreVisibleChange(visible); }}
-            childIconHeight={36}
-            active={idx === t.state.activeIndex}
-            activeIndex={t.state.activeIndex}
-            type="center"
-            onClick={(...rest) => {
-              t.onItemClick(...rest);
-            }}
-          />
-        );
-      }
-      return (
-        <TabBarItem
-          key={idx}
-          item={child}
-          iconHeight={t.props.iconHeight}
-          active={idx === t.state.activeIndex}
-          onClick={() => {
-            t.onItemClick(idx, child.props.path);
-          }}
-        />
-      );
-    });
-  }
-
-  /**
-  * Tab bar items data from props, like <TabBar items={}/>
-  */
   propsRenderWay() {
     const t = this;
     return this.props.items.map((item, idx) => {
       if (item.items) {
         t.centerTabIndex = idx;
         return (
-          <TabBarItemCenter
+          <TBTabBarCenter 
             {...item}
             key={idx.toString()}
-            index={idx}
-            moreVisible={this.state.centerMoreVisible}
-            onMoreVisibleChange={(visible) => { this.handleCenterMoreVisibleChange(visible); }}
-            iconHeight={item.cIconHeight || t.props.cIconHeight}
-            childIconHeight={36}
-            active={idx === t.state.activeIndex}
-            activeIndex={t.state.activeIndex}
-            type="center"
-            onClick={(...rest) => {
-              t.onItemClick(...rest);
-            }}
           />
         );
       }
@@ -164,6 +117,35 @@ class TabBar extends React.Component {
           active={idx === t.state.activeIndex}
           onClick={() => {
             t.onItemClick(idx, item.path);
+          }}
+        />
+      );
+    });
+  }
+
+  childrenRenderWay() {
+    const t = this;
+    return React.Children.map(this.props.children, (child, idx) => {
+      if (!child) {
+        return null;
+      }
+      if (child.props.items) {
+        t.centerTabIndex = idx;
+        return (
+          <TBTabBarCenter 
+            {...item}
+            key={idx.toString()}
+          />
+        );
+      }
+      return (
+        <TabBarItem
+          key={idx}
+          item={child}
+          iconHeight={t.props.iconHeight}
+          active={idx === t.state.activeIndex}
+          onClick={() => {
+            t.onItemClick(idx, child.props.path);
           }}
         />
       );
@@ -212,6 +194,6 @@ class TabBar extends React.Component {
 }
 
 TabBar.Item = TabBarItem;
-TabBar.Item2 = TabBarItemCenter;
+TabBar.Item2 = TBTabBarCenter;
 
-export default TabBar;
+export default TBTabBar;

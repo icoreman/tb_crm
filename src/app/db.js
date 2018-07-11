@@ -1,7 +1,8 @@
 import nattyFetch from 'natty-fetch';
 import { Toast } from 'saltui';
 
-import { urlPrefix, isDev } from './variables';
+import { urlPrefix,URLS, isDev } from './variables';
+import Loading from 'components/loading';
 
 // See https://github.com/Jias/natty-fetch for more details.
 const context = nattyFetch.context({
@@ -38,6 +39,16 @@ context.create('SomeModuleAPI', {
       Toast.show({
         type: 'loading',
         content: 'Loading',
+      });
+    },
+  },
+  customerManageList: {
+    mockUrl: 'customer/listCustomerManage.json',
+    url: URLS.customerManageList,
+    method:'POST',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
       });
     },
   },

@@ -7,7 +7,11 @@ import { Toast, Dialog } from 'saltui';
 
 import { isDev } from 'variables';
 import PageHome from 'pages/home';
+import PageFunc from 'pages/func';
 import PageDemo from 'pages/demo';
+import PageCustomerAdd from 'pages/customer/add';
+import PageCustomerManage from 'pages/customer/manage_list';
+
 import DB from 'db';
 import './app.less';
 
@@ -54,8 +58,11 @@ render(
   <Router history={customHistory}>
     <Route name="app" path="/" component={App}>
       <IndexRoute component={PageHome} />
-      <Route path="home" component={PageHome} />
+      <Route path="/home" component={PageHome} />
+      <Route path="/func" component={PageFunc} />
       <Route path="demo" component={PageDemo} />
+      <Route path="/customer/add" component={PageCustomerAdd} />
+      <Route path="/customer/managelist" component={PageCustomerManage} />
     </Route>
   </Router>,
   document.getElementById('App'),

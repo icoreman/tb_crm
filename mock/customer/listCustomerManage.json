@@ -1,0 +1,26 @@
+{
+    "success": true,
+    "content": {
+        "data": [{
+            "id": "1234",
+            "custName": "王小虎",
+            "custMainCustomer": "核心客户",
+            "custStage": "评审中",
+            "noUpdateDays" : "2天"
+        }, {
+            "id": "1357",
+            "custName": "张小丽",
+            "custMainCustomer": "商业客户",
+            "custStage": "已评审",
+            "noUpdateDays" : "10天"
+        }, {
+            "id": "1728",
+            "custName": "孙大圣",
+            "custMainCustomer": null,
+            "custStage": "未评审",
+            "noUpdateDays" : "0天"
+        }],
+        "currentPage" : 1,
+        "waitCount" : 0
+    }
+}
