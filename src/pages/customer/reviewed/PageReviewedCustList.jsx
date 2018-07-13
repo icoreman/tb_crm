@@ -1,7 +1,7 @@
 import { Component } from 'refast';
 import DB from '../../../app/db';
-import CustManageListItem from 'components/customer/cust_manage_list_item';
-import CustManageAddAboutPop from 'components/customer/cust_manage_add_about_pop';
+import CustHomeListItem from 'components/customer/cust_home_list_item';
+
 import {
     Group,
     TextField,
@@ -12,8 +12,7 @@ import {
     Popup
 } from 'saltui';
 
-import './PageCustList.less';
-import { hashHistory } from 'react-router';
+import './PageReviewedCustList.less';
 
 const { HBox,VBox, Box } = Boxs; 
 
@@ -22,7 +21,7 @@ const {
   ButtonGroup,
 } = Button;
 
-export default class PageCustList extends Component {
+export default class PageReviewedCustList extends Component {
 
     constructor(props) {
         super(props);
@@ -31,13 +30,11 @@ export default class PageCustList extends Component {
         t.state = {
           title:'',
           data:[],
-          imageStatus:'none',
-          addAboutPopVisable: false,
-          selectedCustId: null
+          imageStatus:'none'
         };
 
         dd.biz.navigation.setTitle({
-          title : "客户管理",//控制标题文本，空字符串表示显示默认文本
+          title : "已评审客户",//控制标题文本，空字符串表示显示默认文本
           onSuccess : function(result) {
 
           },
@@ -47,7 +44,7 @@ export default class PageCustList extends Component {
 
     componentDidMount() {
      
-      DB.SomeModuleAPI.customerManageList({
+      DB.SomeModuleAPI.customerReviewedList({
         page:1,
         pageSize:15
       })
@@ -77,18 +74,8 @@ export default class PageCustList extends Component {
         });
     }
 
-    clickItem(id,item) {
-      if(item == "add"){
-        Popup.show(<CustManageAddAboutPop custId={ id } onClick= { this.clickPopItem.bind(this) } />, {
-          animationType: 'slide-up',
-        });
-      } else {
-        hashHistory.push('/customer/edit?id='+id);
-      }
-    }
-
-    clickPopItem(id,item) {
-      console.log(id);
+    clickItem(id) {
+  
     }
 
     render() {
@@ -96,7 +83,7 @@ export default class PageCustList extends Component {
         return (
             <div className="page-form">
                   <Group>             
-                   <CustManageListItem list={t.state.data} onClick= { t.clickItem.bind(this) }/>
+                   <CustHomeListItem list={t.state.data} onClick= { t.clickItem.bind(this) }/>
                   </Group>
                   <div className="nodata-wrapper" style={{display:t.state.imageStatus}}>
                       <VBox vAlign="center" hAlign="center" className="nodata">
@@ -107,9 +94,6 @@ export default class PageCustList extends Component {
                               暂无数据
                           </Box>
                       </VBox>
-                  </div>
-                  <div className="t-tabs-button">
-                     <Button type="primary" onClick={ t.handleClick }>新建客户</Button>
                   </div>
             </div>
         )

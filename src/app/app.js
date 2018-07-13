@@ -10,7 +10,11 @@ import PageHome from 'pages/home';
 import PageFunc from 'pages/func';
 import PageDemo from 'pages/demo';
 import PageCustomerAdd from 'pages/customer/add';
+import PageCustomerNew from 'pages/customer/new';
+import PageCustomerEdit from 'pages/customer/edit';
 import PageCustomerManage from 'pages/customer/manage_list';
+import PageCustomerReviewed from 'pages/customer/reviewed';
+import PageCustomerToReviewed from 'pages/customer/to_be_reviewed';
 
 import DB from 'db';
 import './app.less';
@@ -62,7 +66,11 @@ render(
       <Route path="/func" component={PageFunc} />
       <Route path="demo" component={PageDemo} />
       <Route path="/customer/add" component={PageCustomerAdd} />
+      <Route path="/customer/new" component={PageCustomerNew} />
+      <Route path="/customer/edit" component={PageCustomerEdit} />
       <Route path="/customer/managelist" component={PageCustomerManage} />
+      <Route path="/customer/reviewed" component={PageCustomerReviewed} />
+      <Route path="/customer/to_be_reviewed" component={PageCustomerToReviewed} />
     </Route>
   </Router>,
   document.getElementById('App'),

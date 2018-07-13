@@ -1,1 +1,1 @@
-export default from './PageCustAdd';
+export default from './PageCustomerAdd';

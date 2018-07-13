@@ -32,7 +32,7 @@ export default class PageFunc extends Component {
       activeIndex: 2,
       loading: false,
       refreshing: false,
-       winHeight:winHeight,
+      winHeight:winHeight,
     };
     this.tabBarItems = [
       {

@@ -1,0 +1,68 @@
+{
+    "success": true,
+    "content": {
+        "data": [{
+            "id": "1",
+            "custName": "王小虎",
+            "custLevel": "1个亿",
+            "createDate": "2018-07-13",
+            "createName" : "王大虎"
+        }, {
+            "id": "2",
+            "custName": "王小虎",
+            "custLevel": "1个亿",
+            "createDate": "2018-07-13",
+            "createName" : "王大虎"
+        }, {
+            "id": "3",
+            "custName": "王小虎",
+            "custLevel": "1个亿",
+            "createDate": "2018-07-13",
+            "createName" : "王大虎"
+        }, {
+            "id": "4",
+            "custName": "王小虎",
+            "custLevel": "1个亿",
+            "createDate": "2018-07-13",
+            "createName" : "王大虎"
+        }, {
+            "id": "5",
+            "custName": "王小虎",
+            "custLevel": "1个亿",
+            "createDate": "2018-07-13",
+            "createName" : "王大虎"
+        }, {
+            "id": "6",
+            "custName": "王小虎",
+            "custLevel": "1个亿",
+            "createDate": "2018-07-13",
+            "createName" : "王大虎"
+        }, {
+            "id": "7",
+            "custName": "王小虎",
+            "custLevel": "1个亿",
+            "createDate": "2018-07-13",
+            "createName" : "王大虎"
+        }, {
+            "id": "8",
+            "custName": "王小虎",
+            "custLevel": "1个亿",
+            "createDate": "2018-07-13",
+            "createName" : "王大虎"
+        }, {
+            "id": "9",
+            "custName": "王小虎",
+            "custLevel": "1个亿",
+            "createDate": "2018-07-13",
+            "createName" : "王大虎"
+        }, {
+            "id": "10",
+            "custName": "王小虎",
+            "custLevel": "1个亿",
+            "createDate": "2018-07-13",
+            "createName" : "王大虎"
+        }],
+        "currentPage" : 1,
+        "waitCount" : 0
+    }
+}

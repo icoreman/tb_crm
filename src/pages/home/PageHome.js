@@ -23,6 +23,7 @@ export default class PageHome extends Component {
       activeIndex: 0,
       loading: false,
       refreshing: false,
+      badges: {},
     };
     this.tabBarItems = [
       {
@@ -70,16 +71,7 @@ export default class PageHome extends Component {
   }
 
   handlerClickGrid(pathTo) {
-     Toast.show({
-        type: 'loading',
-        content: pathTo,
-      });
-
-      setTimeout(() => {
-        Toast.hide(() => {
-         
-        });
-      }, 2000);
+    hashHistory.push(pathTo);
   }
 
   render() {
@@ -101,84 +93,83 @@ export default class PageHome extends Component {
     return (
       <div>
         <div className="container">
-            <Tab activeKey={ '0' } showScroll>
-            <Tab.Item key="0" title="待审阅" >
-              <ScrollView
-                infiniteScroll
-                refreshControl
-                refreshControlOptions={{
-                  refreshing: this.state.refreshing,
-                  onRefresh: this.onRefresh.bind(this),
-                }}
+            <Tab active={'0'} showScroll>
+              <Tab.Item title="待审阅" >
+                <ScrollView
+                  infiniteScroll
+                  refreshControl
+                  refreshControlOptions={{
+                    refreshing: this.state.refreshing,
+                    onRefresh: this.onRefresh.bind(this),
+                  }}
 
-                className="scroll-view-demo"
-              >
-                <div
-                  className="section-content"
-                  style={{ backgroundColor: 'rgba(31,56,88,0.06)', padding: '10px 0 10px 0' }}
+                  className="scroll-view-demo"
                 >
-                  <Grid col={3} className="t-BCf" square touchable>
-                    <Badge count={10} onClick={() => { t.handlerClickGrid('新用户'); }}>
-                      <div className="demo" onClick={() => { t.handlerClickGrid('新用户'); }}>
-                        <User fill={'#42A5F5'} />
-                        <div className="menu-title">新客户</div>
-                      </div>
-                    </Badge>
+                  <div
+                    className="section-content"
+                    style={{ backgroundColor: 'rgba(31,56,88,0.06)', padding: '10px 0 10px 0' }}
+                  >
+                    <Grid col={3} className="t-BCf" square touchable>
+                      <Badge count={10} onClick={() => { t.handlerClickGrid('/customer/to_be_reviewed'); }}>
+                        <div className="demo" onClick={() => { t.handlerClickGrid('/customer/to_be_reviewed'); }}>
+                          <User fill={'#42A5F5'} />
+                          <div className="menu-title">待评审客户</div>
+                        </div>
+                      </Badge>
 
-                    <Badge count={0} onClick={() => { t.handlerClickGrid('新商机'); }}>
-                      <div className="demo" onClick={() => { t.handlerClickGrid('新商机'); }}>
-                        <Time fill={'#FF8A65'} />
-                        <div className="menu-title">新商机</div>
-                      </div>
-                    </Badge>
+                      <Badge count={0} onClick={() => { t.handlerClickGrid('/customer/reviewed'); }}>
+                        <div className="demo" onClick={() => { t.handlerClickGrid('/customer/reviewed'); }}>
+                          <Time fill={'#FF8A65'} />
+                          <div className="menu-title">已评审客户</div>
+                        </div>
+                      </Badge>
 
-                    <Badge count={10} onClick={() => { t.handlerClickGrid('新问题'); }}>
-                      <div className="demo" onClick={() => { t.handlerClickGrid('新问题'); }}>
-                        <Star fill={'#EA80FC'} />
-                        <div className="menu-title">新问题</div>
-                      </div>
-                    </Badge>
+                      <Badge count={10} onClick={() => { t.handlerClickGrid('/customer/new'); }}>
+                        <div className="demo" onClick={() => { t.handlerClickGrid('/customer/new'); }}>
+                          <Star fill={'#EA80FC'} />
+                          <div className="menu-title">新客户</div>
+                        </div>
+                      </Badge>
 
-                    <Badge count={10} onClick={() => { t.handlerClickGrid('已评审客户'); }}>
-                      <div className="demo" onClick={() => { t.handlerClickGrid('已评审客户'); }}>
-                        <Map fill={'#EF9A9A'} />
-                        <div className="menu-title">已评审客户</div>
-                      </div>
-                    </Badge>
+                      <Badge count={10} onClick={() => { t.handlerClickGrid('新商机'); }}>
+                        <div className="demo" onClick={() => { t.handlerClickGrid('新商机'); }}>
+                          <Map fill={'#EF9A9A'} />
+                          <div className="menu-title">新商机</div>
+                        </div>
+                      </Badge>
 
-                    <Badge count={10} onClick={() => { t.handlerClickGrid('出差报告'); }}>
-                      <div className="demo" onClick={() => { t.handlerClickGrid('出差报告'); }}>
-                        <Pen fill={'#9FA8DA'} />
-                        <div className="menu-title">出差报告</div>
-                      </div> 
-                    </Badge>
+                      <Badge count={10} onClick={() => { t.handlerClickGrid('新问题'); }}>
+                        <div className="demo" onClick={() => { t.handlerClickGrid('新问题'); }}>
+                          <Pen fill={'#9FA8DA'} />
+                          <div className="menu-title">新问题</div>
+                        </div> 
+                      </Badge>
 
-                    <Badge count={10} onClick={() => { t.handlerClickGrid('逾期回款'); }}>
-                      <div className="demo" onClick={() => { t.handlerClickGrid('逾期回款'); }}>
-                        <InfoCircle fill={'#80DEEA'} />
-                        <div className="menu-title">逾期回款</div>
-                      </div>  
-                    </Badge>
-                  </Grid>
+                      <Badge count={10} onClick={() => { t.handlerClickGrid('出差报告'); }}>
+                        <div className="demo" onClick={() => { t.handlerClickGrid('出差报告'); }}>
+                          <InfoCircle fill={'#80DEEA'} />
+                          <div className="menu-title">出差报告</div>
+                        </div>  
+                      </Badge>
+                    </Grid>
                 </div>
               </ScrollView>
             </Tab.Item>
-            <Tab.Item key="1" title="出差清单" >
+            <Tab.Item title="出差清单" >
               <div>
-                <h1>出差清单</h1>
+               <h1>出差清单</h1>
               </div>
             </Tab.Item>
           </Tab>
-          
         </div>
         <TabBar
           className="main-tabbar"
-          tabBarStyle={tabBarStyle}
-          activeIndex={this.state.activeIndex}
-          onChange={onChange}
-          iconHeight={24}
-          cIconHeight={50}
-          items={this.tabBarItems}
+          tabBarStyle={ tabBarStyle }
+          activeIndex={ this.state.activeIndex }
+          onChange={ onChange }
+          iconHeight={ 24 }
+          cIconHeight={ 50 }
+          items={ this.tabBarItems }
         />
       </div>
     );

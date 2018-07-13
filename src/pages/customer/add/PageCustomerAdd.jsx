@@ -18,7 +18,7 @@ import {
     PickerField,PhotoField
 } from 'saltui';
 
-import './PageCustAdd.less';
+import './PageCustomerAdd.less';
 
 const custLevelProps = [
     {value: '前10', text: '前10'}, 
@@ -129,7 +129,7 @@ export default class PageCustAdd extends Component {
             <div className="t-FS16">
                 <Group>  
                     <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <TextField required label="客户名称*" placeholder="请选择" value={ t.state.custName }
+                        <TextField required label="客户名称" placeholder="请选择" value={ t.state.custName }
                                    onChange={t.handleChange.bind(t, 'custName')} />
                     </Group.List>
                 </Group>
@@ -180,7 +180,7 @@ export default class PageCustAdd extends Component {
                             required
                             label="客户来源"
                             options={custSourceProps}
-                            onSelect={this.handleChange.bind(t, 'custStage')}
+                            onSelect={this.handleChange.bind(t, 'custSource')}
                             value={this.state.custSource}
                             placeholder="请选择"
                             />

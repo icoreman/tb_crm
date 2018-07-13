@@ -9,6 +9,9 @@ export default {
   isDev,
   // 这里放置全局的调用的URL
   URLS: {
-    customerManageList:urlPrefix+"customer/listCustomerManage"//客户管理list
+    customerManageList: urlPrefix + "customer/listCustomerManage",//客户管理list
+    custToBeReviewedList: urlPrefix + "customer/listCustomerstToBeReviewed",//待评审的客户list
+    custReviewedList: urlPrefix + "customer/listCustomerstReviewed",//已评审的客户list
+    custNewList: urlPrefix + "customer/listCustomerNew"//新客户
   },
 };

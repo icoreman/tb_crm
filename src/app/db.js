@@ -52,6 +52,36 @@ context.create('SomeModuleAPI', {
       });
     },
   },
+  customerToBeReviewedList: {
+    mockUrl: 'customer/listCustomerToBeReviewed.json',
+    url: URLS.custToBeReviewedList,
+    method:'GET',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    }
+  },
+  customerReviewedList: {
+    mockUrl: 'customer/listCustomerReviewed.json',
+    url: URLS.custReviewedList,
+    method:'GET',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    }
+  },
+  customerNewList: {
+    mockUrl: 'customer/listCustomerNew.json',
+    url: URLS.custNewList,
+    method:'GET',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    }
+  }
 });
 
 export default context.api;
