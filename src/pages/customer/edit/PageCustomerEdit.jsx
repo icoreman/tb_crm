@@ -1,7 +1,7 @@
 import { Component } from 'refast';
 import DB from '../../../app/db';
 import {
-    Group,DatetimeField,
+    Group,DatetimeField,Card,Tab,
     TextField,
     TextareaField,
     Slot,
@@ -51,17 +51,25 @@ export default class PageCustomerEdit extends Component {
         let t = this;
         
         t.state = {
-            custName: '',
-            custSimpleName: '',
-            custIndustryStatus: '',
-            custStage: '',
-            custLevel: '',
-            custCenter: '',
-            custSource: '',
-            poteSalesOne:'',
-            custMainBusiness:'',
-            custSalesman: '',
-            custAddress:''
+          baseInfo : {
+                "id": "",
+                "custName" : "",
+                "noUpdateDays" : "",
+                "custSimpleName" : "",
+                "custSapNo" : "",
+                "custStage" : "",
+                "custCenter" : "",
+                "custIncomeLast" : "",
+                "custDemandNum" : "",
+                "custSource" : "",
+                "custIndustryStatus" : "",
+                "custMainBusiness" : "",
+                "custAddress" : "",
+                "custSalesman" : ""
+          },
+          links : [],
+          chances: [],
+          questions : []
         };
         
 
@@ -72,7 +80,7 @@ export default class PageCustomerEdit extends Component {
               {
                  "id":"1",//字符串
                 "iconId":"",//字符串，图标命名
-                "text":"新增客户"
+                "text":"客户详细信息"
               }
             ],
             onSuccess: function(data) {
@@ -84,22 +92,40 @@ export default class PageCustomerEdit extends Component {
         
     }
 
-    handleClick() {
-        for (let key in this.state) {
-            if (/^required\d+$/.test(key) && !this.state[key]) {
-                Toast.show({
-                    type: 'error',
-                    content: '请填写必填项',
-                    onHide: function () {
-                    }
-                });
-                return;
-            }
-        }
-        
-        console.log(this.state);
+    componentDidMount() {
+     
+      DB.CrmCustomerAPI.customer360InfoBase({
+        page:1,
+        pageSize:15
+      })
+         .then((content) => {
+          console.log(content);
+          if(content.length>0){
+            this.setState({
+              baseInfo:content.baseInfo,
+            });
+          }else{
+             this.setState({
+              baseInfo:content.baseInfo,
+            });
+          }
+        }).catch((error) => {
+           alert('--' + error);
+            // 失败 or 有异常被捕获
+            this.setState({
+              baseInfo:[]
+            });
+            Toast.show({
+              type: 'error',
+              content: '查询出错'
+            });
+        });
     }
-    
+
+    handleEditClick() {
+       hashHistory.push('/customer/add');
+    }
+
     handleChange(label, value) {
         let t = this;
         t.setState({
@@ -107,7 +133,7 @@ export default class PageCustomerEdit extends Component {
         }, () => {
             let disabled = false;
             for (let key in t.state) {
-                if (/^required\d+$/.test(key) && !t.state[key]) {
+                if (/^\d+$/.test(key) && !t.state[key]) {
                     disabled = true;
                     break;
                 }
@@ -128,104 +154,101 @@ export default class PageCustomerEdit extends Component {
         let t = this;
         return (
             <div className="t-FS16">
-                <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <TextField required label="客户名称" placeholder="请选择" value={ t.state.custName }
-                                   onChange={t.handleChange.bind(t, 'custName')} />
-                    </Group.List>
-                </Group>
-                <div className="t-MB10"></div>
-                <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <TextField label="客户简称" placeholder="请选择" value={ t.state.custSimpleName }
-                                   onChange={t.handleChange.bind(t, 'custSimpleName')} />
-                    </Group.List>
-                </Group>
-                <div className="t-MB10"></div>
-                <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <SelectField
-                            required
-                            label="行业地位"
-                            options={custLevelProps}
-                            onSelect={this.handleChange.bind(t, 'custLevel')}
-                            value={this.state.custLevel}
-                            placeholder="请选择"
-                            />
-                    </Group.List>
-                </Group>
-                <div className="t-MB10"></div>
-                <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <SelectField
-                            required
-                            label="客户阶段"
-                            options={custStageProps}
-                            onSelect={this.handleChange.bind(t, 'custStage')}
-                            value={this.state.custStage}
-                            placeholder="请选择"
-                            />
-                    </Group.List>
-                </Group>
-                <div className="t-MB10"></div>
-                <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <TextField required label="产品中心" onSelect={t.handleChange.bind(t, 'custCenter')} 
-                        value={t.state.custCenter} placeholder="请输入" />
-                    </Group.List>
-                </Group>
-                <div className="t-MB10"></div>
-                <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <SelectField
-                            required
-                            label="客户来源"
-                            options={custSourceProps}
-                            onSelect={this.handleChange.bind(t, 'custSource')}
-                            value={this.state.custSource}
-                            placeholder="请选择"
-                            />
-                    </Group.List>
-                </Group>
-                <div className="t-MB10"></div>
-                <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <TextField required label="上年度营收（万元）"
-                          placeholder="请输入" value={t.state.poteSalesOne}
-                          onChange={t.handleChange.bind(t,'poteSalesOne')}/>
-                    </Group.List>
-                </Group>
-                <div className="t-MB10"></div>
-                <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <TextField required label="主营业务"
-                          placeholder="请输入" value={t.state.custMainBusiness}
-                          onChange={t.handleChange.bind(t,'custMainBusiness')}/>
-                    </Group.List>
-                </Group>
-                <div className="t-MB10"></div>
-                <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <TextField required label="公司地址"
-                          placeholder="请输入" value={t.state.custAddress}
-                          onChange={t.handleChange.bind(t,'custAddress')}/>
-                    </Group.List>
-                </Group>
-                <div className="t-MB10"></div>
-                <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <TextField required label="销售人员"
-                          placeholder="请输入" value={t.state.custSalesman}
-                          onChange={t.handleChange.bind(t,'custSalesman')}/>
-                    </Group.List>
-                </Group>
-                <div className="t-MB10"></div>
-                <div style={{padding: '30px 15px'}}>
-                    <Button.Group>
-                      <Button type="secondary" display="inline" onClick={this.handleClick.bind(this)}>暂存</Button>
-                      <Button type="primary" display="inline" onClick={this.handleClick.bind(this)}>保存</Button>
-                    </Button.Group>
+              <Card mode="full" className="card-sence">
+                <div className="card-body">
+                  <div className="card-title">{ t.state.baseInfo.custName }</div>
                 </div>
+                <div className="card-footer">
+                  <div className="card-footer-meta">
+                    <span className="card-footer-meta-item">
+                      未更新天数：
+                      <span className="card-eye-count">{ t.state.baseInfo.noUpdateDays }</span>
+                    </span>
+                  </div>
+                  <div className="card-footer-extra">{ t.state.baseInfo.custStage }</div>
+                </div>
+              </Card>
+              <Tab active={'0'} showScroll>
+                <Tab.Item title="待审阅" >
+                  <Group>  
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField  readOnly label="客户名称"  value={ t.state.baseInfo.custName }/>
+                    </Group.List>
+                  </Group>
+                  <div className="t-MB10"></div>
+                    <Group>  
+                      <Group.List lineIndent={18} className="content-FAR t-FS16">
+                        <TextField label="客户简称" readOnly  value={ t.state.baseInfo.custSimpleName }/>
+                      </Group.List>
+                    </Group>
+                  <div className="t-MB10"></div>
+                  <Group>  
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="行业地位" readOnly  value={ t.state.baseInfo.custIndustryStatus } />
+                    </Group.List>
+                  </Group>
+                  <div className="t-MB10"></div>  
+                  <Group>  
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="客户阶段" readOnly  value={ t.state.baseInfo.custStage } />
+                    </Group.List>
+                  </Group>
+                  <div className="t-MB10"></div>
+                  <Group>  
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="产品中心" readOnly  value={ t.state.baseInfo.custCenter } />
+                    </Group.List>
+                  </Group>
+                  <div className="t-MB10"></div>
+                  <Group>  
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="客户来源" readOnly  value={ t.state.baseInfo.custSource } />
+                    </Group.List>
+                  </Group>
+                  <div className="t-MB10"></div>
+                  <Group>  
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="上年度营收（万元）" readOnly  value={ t.state.baseInfo.custIncomeLast } />
+                    </Group.List>
+                  </Group>
+                  <div className="t-MB10"></div>
+                  <Group>  
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="主营业务" readOnly  value={ t.state.baseInfo.custMainBusiness } />
+                    </Group.List>
+                  </Group>
+                  <div className="t-MB10"></div>
+                  <Group>  
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="公司地址" readOnly  value={ t.state.baseInfo.custAddress } />
+                    </Group.List>
+                  </Group>
+                  <div className="t-MB10"></div>
+                  <Group>  
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="销售人员" readOnly  value={ t.state.baseInfo.custSalesman } />
+                    </Group.List>
+                  </Group>
+                  <div className="t-MB10"></div>
+                  <Button className="t-tabs-button" type="primary" display="inline" onClick={this.handleEditClick.bind(this)}>编    辑</Button>
+                
+                </Tab.Item>
+                <Tab.Item title="联系人" >
+                  <div>
+                   <h1>联系人</h1>
+                  </div>
+                </Tab.Item>
+                <Tab.Item title="商机" >
+                  <div>
+                   <h1>商机</h1>
+                  </div>
+                </Tab.Item>
+                <Tab.Item title="问题" >
+                  <div>
+                   <h1>问题</h1>
+                  </div>
+                </Tab.Item>  
+              </Tab>
             </div>
         )
     }

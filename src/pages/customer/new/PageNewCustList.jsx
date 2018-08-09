@@ -32,19 +32,11 @@ export default class PageNewCustList extends Component {
           data:[],
           imageStatus:'none',
         };
-
-        dd.biz.navigation.setTitle({
-          title : "新客户",//控制标题文本，空字符串表示显示默认文本
-          onSuccess : function(result) {
-
-          },
-          onFail : function(err) {}
-        });
     }
 
     componentDidMount() {
      
-      DB.SomeModuleAPI.customerNewList({
+      DB.CrmCustomerAPI.customerNewList({
         page:1,
         pageSize:15
       })

@@ -1,5 +1,5 @@
 import { Component } from 'refast';
-import DB from '../../../app/db';
+import React from 'react';
 import CustManageListItem from 'components/customer/cust_manage_list_item';
 import CustManageAddAboutPop from 'components/customer/cust_manage_add_about_pop';
 import {
@@ -13,7 +13,7 @@ import {
 } from 'saltui';
 
 import './PageCustList.less';
-import { hashHistory } from 'react-router';
+import * as logic from './logic';
 
 const { HBox,VBox, Box } = Boxs; 
 
@@ -25,56 +25,11 @@ const {
 export default class PageCustList extends Component {
 
     constructor(props) {
-        super(props);
-        let t = this;
-
-        t.state = {
-          title:'',
-          data:[],
-          imageStatus:'none',
-          addAboutPopVisable: false,
-          selectedCustId: null
-        };
-
-        dd.biz.navigation.setTitle({
-          title : "客户管理",//控制标题文本，空字符串表示显示默认文本
-          onSuccess : function(result) {
-
-          },
-          onFail : function(err) {}
-        });
+        super(props, logic);
     }
 
     componentDidMount() {
-     
-      DB.SomeModuleAPI.customerManageList({
-        page:1,
-        pageSize:15
-      })
-         .then((content) => {
-          if(content.data.length>0){
-            this.setState({
-              data:content.data,
-              imageStatus:'none',
-            });
-          }else{
-             this.setState({
-              data:content.data,
-              imageStatus:'block'
-            });
-          }
-        }).catch((error) => {
-           alert('--' + error);
-            // 失败 or 有异常被捕获
-            this.setState({
-              data:[],
-              imageStatus:'block'
-            });
-            Toast.show({
-            type: 'error',
-            content: '查询出错'
-             });
-        });
+      this.dispatch('load', 1);      
     }
 
     clickItem(id,item) {
@@ -83,12 +38,16 @@ export default class PageCustList extends Component {
           animationType: 'slide-up',
         });
       } else {
-        hashHistory.push('/customer/edit?id='+id);
+        this.dispatch('edit',id);
       }
     }
 
     clickPopItem(id,item) {
       console.log(id);
+    }
+
+    handleAddClick() {
+       hashHistory.push('/customer/add');
     }
 
     render() {
@@ -109,7 +68,7 @@ export default class PageCustList extends Component {
                       </VBox>
                   </div>
                   <div className="t-tabs-button">
-                     <Button type="primary" onClick={ t.handleClick }>新建客户</Button>
+                     <Button type="primary" onClick={ t.handleAddClick }>新建客户</Button>
                   </div>
             </div>
         )

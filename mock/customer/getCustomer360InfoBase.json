@@ -1,0 +1,21 @@
+{
+    "success": true,
+    "content": {
+        "baseInfo": {
+            "id": "1",
+            "custName" : "客户名称",
+            "noUpdateDays" : "10天",
+            "custSimpleName" : "简称",
+            "custSapNo" : "客户编号",
+            "custStage" : "客户阶段",
+            "custCenter" : "产品中心",
+            "custIncomeLast" : "上年度营业收入",
+            "custDemandNum" : "年PCBA需求量",
+            "custSource" : "客户来源",
+            "custIndustryStatus" : "行业地位",
+            "custMainBusiness" : "主营业务",
+            "custAddress" : "公司地址",
+            "custSalesman" : "销售人员"
+        }
+    }
+}

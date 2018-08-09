@@ -45,7 +45,7 @@ export default class PageToBeReviewedCustList extends Component {
 
     componentDidMount() {
      
-      DB.SomeModuleAPI.customerToBeReviewedList({
+      DB.CrmCustomerAPI.customerToBeReviewedList({
         page:1,
         pageSize:15
       })

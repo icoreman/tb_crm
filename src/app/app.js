@@ -8,7 +8,6 @@ import { Toast, Dialog } from 'saltui';
 import { isDev } from 'variables';
 import PageHome from 'pages/home';
 import PageFunc from 'pages/func';
-import PageDemo from 'pages/demo';
 import PageCustomerAdd from 'pages/customer/add';
 import PageCustomerNew from 'pages/customer/new';
 import PageCustomerEdit from 'pages/customer/edit';
@@ -37,7 +36,7 @@ Refast.use('fn', {
   toast: Toast,
   dialog: Dialog,
   DB,
-  history: customHistory,
+  history: hashHistory,
 });
 
 const Loading = () => <div className="kuma-loading" />;
@@ -64,7 +63,6 @@ render(
       <IndexRoute component={PageHome} />
       <Route path="/home" component={PageHome} />
       <Route path="/func" component={PageFunc} />
-      <Route path="demo" component={PageDemo} />
       <Route path="/customer/add" component={PageCustomerAdd} />
       <Route path="/customer/new" component={PageCustomerNew} />
       <Route path="/customer/edit" component={PageCustomerEdit} />

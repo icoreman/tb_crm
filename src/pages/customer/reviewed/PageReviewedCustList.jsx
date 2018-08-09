@@ -44,7 +44,7 @@ export default class PageReviewedCustList extends Component {
 
     componentDidMount() {
      
-      DB.SomeModuleAPI.customerReviewedList({
+      DB.CrmCustomerAPI.customerReviewedList({
         page:1,
         pageSize:15
       })

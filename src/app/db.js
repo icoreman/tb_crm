@@ -30,18 +30,11 @@ const context = nattyFetch.context({
     };
   },
 });
+context.create('CrmHomeAPI', {
 
-context.create('SomeModuleAPI', {
-  getSomeInfo: {
-    mockUrl: 'query/getSomeInfo.json',
-    url: 'query/getSomeInfo.json',
-    willFetch() {
-      Toast.show({
-        type: 'loading',
-        content: 'Loading',
-      });
-    },
-  },
+});
+
+context.create('CrmCustomerAPI', {
   customerManageList: {
     mockUrl: 'customer/listCustomerManage.json',
     url: URLS.customerManageList,
@@ -81,7 +74,29 @@ context.create('SomeModuleAPI', {
         content: <Loading />
       });
     }
+  },
+  customer360InfoBase: {
+    mockUrl: 'customer/getCustomer360InfoBase.json',
+    url: URLS.cust360Info,
+    method:'GET',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    }
   }
 });
 
+context.create('CrmLinkAPI', {
+  custLinkList: {
+    mockUrl: 'link/listLinkByCustomer.json',
+    url: URLS.custLinkList,
+    method:'get',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    },
+  }
+});
 export default context.api;
