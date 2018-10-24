@@ -1,20 +1,26 @@
 import { Component } from 'refast';
 import React from 'react';
-import { ScrollView,Tab,Button,Grid,Badge,Toast,TabBar,Popup} from 'saltui';
+import DB from '../../app/db';
+import { tips,noDataImage } from '../../app/variables';
+import { ScrollView,Tab,Button,Grid,Badge,Toast,TabBar,Popup,ScrollList} from 'saltui';
 
 import User from 'salt-icon/lib/User';
 import Time from 'salt-icon/lib/Time';
 import Plus from 'salt-icon/lib/Plus';
 
 import { hashHistory } from 'react-router';
-import './PageHome.less';
-import * as logic from './logic';
+
 
 import HomeTabPopView from 'components/HomeTabPopView';
+import NoData from 'components/no_data';
+import Upload from 'components/upload';
+
+import './PageHome.less';
 
 export default class PageHome extends Component {
   constructor(props) {
-    super(props, logic);
+    super(props);
+    let token = document.getElementById("token").value;
 
     this.tabBarItems = [
       { title: '首页',
@@ -42,26 +48,30 @@ export default class PageHome extends Component {
         path: '/func', },
     ];
 
-    this.onClickTabBarItem = this.onClickTabBarItem.bind(this);
-    this.onHandlerClickGrid = this.onHandlerClickGrid.bind(this);
-  }
-  
-  onClickTabBarItem(activeIndex) {
-    this.dispatch('clickTabBarItem',activeIndex);
+    this.state = {
+      token: token,
+      title: '首页',
+      badges: {
+        xx : 0,
+        chanType : 0,
+        review : 0,
+        ques : 0,
+        acti : 0,
+        chan : 0,
+        cust : 0
+      },
+      refreshing: false,
+      loading: false,
+      activeIndex: 0
+    };
   }
 
   onRefresh() {
 
   }
 
-  renderInfo() {
-    
-
-    return null;
-  }
-
-  onHandlerClickGrid(pathTo) {
-    this.dispatch('clickGridItem',pathTo);
+  clickGridItem(pathTo) {
+    hashHistory.push(pathTo);
   }
 
   showTbCenterPopView(e) {
@@ -76,7 +86,7 @@ export default class PageHome extends Component {
   }
 
   componentDidMount(){
-    const t = this;
+    let t = this;
     $(".t-tabs-bar-item-more-container-inner").remove();
 
     var centerItem = $(".t-tabs-bar-item").eq(1);
@@ -84,17 +94,66 @@ export default class PageHome extends Component {
     centerItem.on('click', function(e) {
       t.showTbCenterPopView(e);
     });
+
+    let token = t.state.token;
+    if(token == "" || token == undefined) {
+
+      return;
+    }
+
+    DB.CrmUserAPI.getUserNew({
+      token: token
+    }).then((content) => {
+      t.setState({
+          badges: content
+      });
+    }).catch((error) => {
+      t.setState({
+        badges:[]
+      });
+      Toast.show({
+        type: 'error',
+        content: '查询出错'
+      });
+    });
+
+
   }
 
- 
+  beforeFetch (data, from) {
+    return data;
+  }
 
+  handleChangePic(key, value, isInit) {
+    var fid = value.id;
+    var checksum = value.checksum;
+    hashHistory.push('link/scan?fid=' + fid + '&checksum=' + checksum);
+  }
   render() {
     const tabBarStyle = {};
     const t = this;
-    const { refreshing, loading, activeIndex, badges, clickTabBarItem } = t.state;
+    const { refreshing, loading, activeIndex, badges } = t.state;
+
+    const onChange = (activeIndex) => {
+     // 这里是触发每个item之后的回调，会返回当前点击的item的index 值
+      if(activeIndex == 0) {
+
+      } else if (activeIndex == 2) {
+        hashHistory.push('/func/');
+      } else if (activeIndex == '1-0') {
+         hashHistory.push('/customer/add');
+      }
+
+    };
 
     return (
       <div>
+        <Upload
+          label= { '扫描名片' }
+          dir= { 'dist/image' }
+          fileSizeLimit = { 1024 }
+          uploadType = { 'image' }
+          onChange={(value,isInit) => { t.handleChangePic('', value,isInit) } }/>
         <div className="container">
             <Tab active={'0'} showScroll>
               <Tab.Item title="待审阅" >
@@ -108,48 +167,47 @@ export default class PageHome extends Component {
 
                   className="scroll-view-demo"
                 >
-                  <div
-                    className="section-content"
+                  <div className="section-content"
                     style={{ backgroundColor: 'rgba(31,56,88,0.06)', padding: '10px 0 10px 0' }}
                   >
-                    <Grid col={3} className="t-BCf" square touchable>
-                      <Badge count={ badges.custToBeReviewed } onClick={() => { t.onHandlerClickGrid('/customer/to_be_reviewed'); }}>
-                        <div className="demo" onClick={() => { t.onHandlerClickGrid('/customer/to_be_reviewed'); }}>
-                          <User fill={'#42A5F5'} />
-                          <div className="menu-title">待评审客户</div>
-                        </div>
-                      </Badge>
-
-                      <Badge count={ badges.custReviewed } onClick={() => { t.onHandlerClickGrid('/customer/reviewed'); }}>
-                        <div className="demo" onClick={() => { t.onHandlerClickGrid('/customer/reviewed'); }}>
+                    <Grid col={2} className="t-BCf" touchable>
+                      <Badge count={ badges.review } onClick={ t.clickGridItem.bind(t,'/customer/list?custNew=ok&states=over') }>
+                        <div className="demo" onClick={t.clickGridItem.bind(t,'/customer/list?custNew=ok&states=over') }>
                           <User fill={'#FF8A65'} />
                           <div className="menu-title">已评审客户</div>
                         </div>
                       </Badge>
 
-                      <Badge count={ badges.custNew } onClick={() => { t.onHandlerClickGrid('/customer/new'); }}>
-                        <div className="demo" onClick={() => { t.onHandlerClickGrid('/customer/new'); }}>
+                      <Badge count={ badges.cust } onClick={t.clickGridItem.bind(t,'/customer/list?custNew=ok') }>
+                        <div className="demo" onClick={t.clickGridItem.bind(t,'/customer/list?custNew=ok') }>
                           <User fill={'#EA80FC'} />
                           <div className="menu-title">新客户</div>
                         </div>
                       </Badge>
 
-                      <Badge count={ badges.chanceNew } onClick={() => { t.onHandlerClickGrid('新商机'); }}>
-                        <div className="demo" onClick={() => { t.onHandlerClickGrid('新商机'); }}>
+                      <Badge count={ badges.chan } onClick={t.clickGridItem.bind(t,'/chance/list?chanNew=ok') }>
+                        <div className="demo" onClick={t.clickGridItem.bind(t,'/chance/list?chanNew=ok')  }>
                           <User fill={'#EF9A9A'} />
                           <div className="menu-title">新商机</div>
                         </div>
                       </Badge>
 
-                      <Badge count={ badges.questionNew } onClick={() => { t.onHandlerClickGrid('新问题'); }}>
-                        <div className="demo" onClick={() => { t.onHandlerClickGrid('新问题'); }}>
+                      <Badge count={ badges.chanType } onClick={t.clickGridItem.bind(t,'/chance/list?chanNew=ok&chanType=ok') }>
+                        <div className="demo" onClick={t.clickGridItem.bind(t,'/chance/list?chanNew=ok&chanType=ok')  }>
+                          <User fill={'#EF9A9A'} />
+                          <div className="menu-title">已评估商机</div>
+                        </div>
+                      </Badge>
+
+                      <Badge count={ badges.ques } onClick={t.clickGridItem.bind(t,'/question/list?quesNew=ok')  }>
+                        <div className="demo" onClick={t.clickGridItem.bind(t,'/question/list?quesNew=ok') }>
                           <User fill={'#9FA8DA'} />
                           <div className="menu-title">新问题</div>
                         </div> 
                       </Badge>
 
-                      <Badge count={ badges.reportNew } onClick={() => { t.onHandlerClickGrid('出差报告'); }}>
-                        <div className="demo" onClick={() => { t.onHandlerClickGrid('出差报告'); }}>
+                      <Badge count={ badges.acti } onClick={t.clickGridItem.bind(t,'出差报告')  }>
+                        <div className="demo" onClick={t.clickGridItem.bind(t,'出差报告')  }>
                           <User fill={'#80DEEA'} />
                           <div className="menu-title">出差报告</div>
                         </div>  
@@ -159,9 +217,7 @@ export default class PageHome extends Component {
               </ScrollView>
             </Tab.Item>
             <Tab.Item title="出差清单" >
-              <div>
-               <h1>出差清单</h1>
-              </div>
+              <NoData/>
             </Tab.Item>
           </Tab>
         </div>
@@ -169,7 +225,7 @@ export default class PageHome extends Component {
           className="main-tabbar"
           tabBarStyle={ tabBarStyle }
           activeIndex={ activeIndex }
-          onChange={ t.onClickTabBarItem }
+          onChange={ onChange }
           iconHeight={ 24 }
           cIconHeight={ 50 }
           items={ t.tabBarItems }

@@ -14,21 +14,32 @@
 <meta name="format-detection" content="email=no">
 
 <!-- 项目样式资源加载 -->
-<link rel="stylesheet" href="/app.css">
+<link rel="stylesheet" href="./app.css">
 
 <!-- 外部脚本资源加载 -->
 <script src="//g.alicdn.com/platform/c/??react/0.14.3/react-with-addons.js,react/0.14.3/react-dom.js,react-router/2.0.0/umd/ReactRouter.js,fastclick/1.0.6/lib/fastclick.js,lie/3.0.2/dist/lie.polyfill.js,salt-router/0.0.2/salt-router.js"></script>
-<script src="//g.alicdn.com/dingding/open-develop/1.5.3/dingtalk-ali.js"></script>
-<script src="../../../fui/libdingding/jquery-3.1.0.min.js" ></script>
+<script src="//res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script src="//code.jquery.com/jquery-3.1.0.min.js"></script>
+
 </head>
 <body>
 <!-- Nowa Server 注入位置 -->
 <!-- nowa server injects -->
 <input type="hidden" id="context" value=""/>
+<input type="hidden" id="token" value=""/>
+<input type="hidden" id="userId" value=""/>
+<input type="hidden" id="ezplatformUserId" value=""/>
+<input type="hidden" id="ezplatformUserName" value=""/>
+<input type="hidden" id="ezplatformOrgId" value=""/>
+<input type="hidden" id="ezplatformOrgName" value=""/>
+<input type="hidden" id="moblieMainPageUrl" value=""/>
+
 <div id="App"></div>
-<script src="../../../fui/libdingding/base.js"  ></script>
+<div id='clickArea' style="display:none"></div>
+<script src="./base.js"></script>
+<script src="../mobile/js/wxutil.js"></script>
 
 <!-- 项目脚本资源加载 -->
-<script src="/app.js"></script>
+<script src="./app.js"></script>
 </body>
 </html>

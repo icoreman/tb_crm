@@ -57,6 +57,6 @@
             "noUpdateDays" : "0天"
         }],
         "currentPage" : 1,
-        "waitCount" : 0
+        "total" : 20
     }
 }

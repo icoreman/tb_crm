@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>免登 Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+  <!-- <link rel="stylesheet" href="css/style.css"> -->
+  <script src="http://code.jquery.com/jquery-1.4.1.min.js"></script>
+  <script src="//g.alicdn.com/dingding/dingtalk-jsapi/2.0.57/dingtalk.open.js"></script>
+  <script src="../js/dingutil.js?v=6"></script>
+  
+  <script>
+  	function cb(data){
+		$("#d1").html("结果为："+data.result + "jwttoken为："+data.token);
+	}
+  	getJSToken11(GetQueryContextUrl("/flexoffice"),window.location,GetQueryString("agentId"),GetQueryString("jwtCorpId"),GetQueryString("corpId"));
+    function getJSToken11(context,url,agentId,jwtCorpId,corpId,callback){
+        $.ajax({
+             type: "get",
+             url: context + "/mobile/api/dingding/getJsTicket?agentId=" +agentId+ "&url=" + encodeURIComponent(url)+ "&jwtCorpId="+jwtCorpId, //替换网址，xxx根据自己jssdk文件位置修改 
+    		success:function(data){
+    			console.log(JSON.stringify(data));
+    			dd.error(function(error){
+    			       /**
+    			        {
+    			           errorMessage:"错误信息",// errorMessage 信息会展示出钉钉服务端生成签名使用的参数，请和您生成签名的参数作对比，找出错误的参数
+    			           errorCode: "错误码"
+    			        }
+    			       **/
+    			       alert('dd error: ' + JSON.stringify(err));
+    			       console.log("dd error:"+JSON.stringify(err));
+    			});
+    	        console.log("agentId="+agentId+"corpId="+corpId);
+    	        console.log("timeStamp="+data.timeStamp+"nonceStr="+data.nonce+"signature="+data.signature);
+    	        dd.config({
+    	          agentId : agentId, // 必填，微应用ID
+    	          corpId : corpId,//必填，企业ID
+    	          timeStamp : data.timeStamp, // 必填，生成签名的时间戳
+    	          nonceStr : data.nonce, // 必填，生成签名的随机串
+    	          signature : data.signature, // 必填，签名
+    	          jsApiList : [
+    	      		'runtime.info',
+    	      		'biz.contact.choose',
+    	      		'device.notification.confirm',
+    	      		'device.notification.alert',
+    	      		'device.notification.prompt',
+    	      		'biz.ding.post',
+    	      		'biz.util.openLink',
+    	      		'biz.util.scanCard'
+    	      	  ] // 必填，需要使用的jsapi列表，注意：不要带dd。
+    	        });
+    	        dd.ready(function() {
+    	            dd.runtime.permission.requestAuthCode({
+    	                corpId: GetQueryString("corpId"), // 企业id
+    	                onSuccess: function (info) {
+    	    	           	// info.code 通过该免登授权码可以获取用户身份
+    	    	            // GetQueryString("agentid") 应用agentId
+    	    	            // jwtCoprId 移动集成设置 单位id用于获取后台设置信息
+    	    	           	// callback 回调方法
+    	    	            //根据免登code调用后台接口获取jwttoken
+    	                	getJWTToken(context,agentId,info.code,jwtCorpId,cb);
+    	                },
+    	                onFail : function(err) {
+    	            		$("#d1").html("结果为："+免登失败);
+    	            	}
+    	            });
+    	            	
+    	        });
+             },
+             error: function (data) {
+                 console.log("连接失败！");
+             }
+         });
+    }
+    
+    function getScancardFun(){//扫描名片实例
+    	dd.ready(function() {
+    		dd.biz.util.scanCard({
+                onSuccess: function (data) {
+                	console.log("a");
+                },
+                onFail : function(err) {
+                	console.log("scanCard err ="+JSON.stringify(err));
+            	}
+            });
+        });
+    }
+   </script>
+   <!-- <script src="../../fmui/libdingding/debuggap.min.js"></script> -->
+</head>
+<body ontouchstart="" >
+	<div id="d1">获取token中...</div>
+	<button onclick="getScancardFun();">扫描</button>
+</body>
+</html>

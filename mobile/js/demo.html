@@ -1,0 +1,35 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>免登 Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+  <link rel="stylesheet" href="css/style.css">
+    <script src="http://code.jquery.com/jquery-1.4.1.min.js"></script>
+	<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+  
+  <script src="../wxutil.js?v=6"></script>
+  <script>
+
+  	function cb(data){
+			$("#d1").html("结果为："+data.result + "jwttoken为："+data.token);
+	}
+	$(function(){
+		getJWTToken("http://192.168.8.141:8888/flexoffice",GetQueryString("agentId"),GetQueryString("code"),cb);
+	    getJSToken("http://192.168.8.141:8888/flexoffice",window.location,"");
+	});
+	</script>
+</head>
+<body ontouchstart="" >
+
+<div id="d1">获取token中...
+</div>
+<button onclick="wx.scanQRCode();">扫描
+</button>
+</body>
+
+</html>
+ 
+ 

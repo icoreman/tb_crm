@@ -1,6 +1,7 @@
 import { Component } from 'react';
 
-import { ScrollView,Button,Grid,Badge,Toast,TabBar,Group } from 'saltui';
+import { ScrollView,Button,Grid,Badge,Toast,TabBar,Group,Popup } from 'saltui';
+import { Agreement } from 'react-weui';
 
 import Time from 'salt-icon/lib/Time';
 import Plus from 'salt-icon/lib/Plus';
@@ -14,25 +15,29 @@ import PlusCircle from 'salt-icon/lib/PlusCircle';
 import Search from 'salt-icon/lib/Search';
 
 import { hashHistory } from 'react-router';
+
+import HomeTabPopView from 'components/HomeTabPopView';
+
+import { func_bcimg_01 } from '../../app/variables';
+
 import './PageFunc.less';
 import { Style } from 'saltui';
 
 
 export default class PageFunc extends Component {
-
-
-  
   constructor(props) {
     super(props);
 
       //获取内容显示区域高度
-   var winHeight = getScrollHigh(0, 0, 1);
-
+    var winHeight = getScrollHigh(0, 0, 1);
+    var winWidth = getWidth();
     this.state = {
+      title: '功能',
       activeIndex: 2,
       loading: false,
       refreshing: false,
       winHeight:winHeight,
+      winWidth: winWidth
     };
     this.tabBarItems = [
       {
@@ -82,98 +87,56 @@ export default class PageFunc extends Component {
       hashHistory.push(pathTo);
   }
 
+  showTbCenterPopView(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    // 隐藏默认的弹出框
+    Popup.show(<HomeTabPopView/>, {
+      animationType: 'slide-up',
+    });
+    
+    $(".main-tabbar").css('z-index','0');
+  }
+
+  componentDidMount(){
+    const t = this;
+    $(".t-tabs-bar-item-more-container-inner").remove();
+
+    var centerItem = $(".t-tabs-bar-item").eq(1);
+
+    centerItem.on('click', function(e) {
+      t.showTbCenterPopView(e);
+    });
+  }
+
   render() {
     const onChange = (activeIndex) => {
       // 这里是触发每个item之后的回调，会返回当前点击的item的index 值
       if(activeIndex == 0) {
-        hashHistory.push('/#/home/');
+        hashHistory.push("/home");
       } else if (activeIndex == 2) {
         
       } else if (activeIndex == '1-0') {
-         hashHistory.push('/customer/add');
+        hashHistory.push("/customer/add");
       }
     };
 
     const tabBarStyle = {};
     const t = this;
 
-    let scrollViewStyle = {height: this.state.winHeight};
-
+    let scrollViewStyle = { height: this.state.winHeight, backgroundImage: "url(" + func_bcimg_01 + ")",
+                            backgroundAttachment: 'fixed',backgroundRepeat: 'no-repeat',
+                            backgroundSize:'cover'  };
+    let buttonTopStyle = { width:'120px', height:'66px', lineHeight:'64px', marginLeft: '16px', marginTop: '100px', background: 'rgba(83, 99, 179,0.6)'};
+    let buttonOtherStyle = { width:'120px',height:'66px', lineHeight:'64px',marginLeft: '16px', marginTop: '20px', background: 'rgba(83, 99, 179,0.6)'};
+    
     return (
       <div>
-        <div style={ scrollViewStyle }>
-          <ScrollView
-            refreshControl
-            refreshControlOptions={{
-              refreshing: this.state.refreshing,
-              onRefresh: this.onRefresh.bind(this),
-            }}
-          >
-            <div
-              className="section-content"
-              style={{ backgroundColor: 'rgba(31,56,88,0.06)'}}
-            >
-              <Group.Head className="t-FS14 t-LH1_5 t-LH20 t-PT10 t-PB10 t-PL18">客户管理</Group.Head>
-              <Group.List>
-                <Grid col={3} className="t-BCf" square touchable>
-                  <Badge count={0} onClick={() => { t.handlerClickGrid('/customer/managelist'); }}>
-                    <div className="demo" onClick={() => { t.handlerClickGrid('/customer/managelist'); }}>
-                      <User fill={'#42A5F5'} />
-                      <div className="menu-title">客户管理</div>
-                    </div>
-                  </Badge>
-                </Grid>
-              </Group.List>
-
-              <Group.Head className="t-FS14 t-LH1_5 t-LH20 t-PT10 t-PB10 t-PL18">商机管理</Group.Head>
-              <Group.List>
-                <Grid col={3} className="t-BCf" square touchable>
-                  <Badge count={0} onClick={() => { t.handlerClickGrid('商机管理'); }}>
-                    <div className="demo" onClick={() => { t.handlerClickGrid('商机管理'); }}>
-                      <User fill={'#42A5F5'} />
-                      <div className="menu-title">商机管理</div>
-                    </div>
-                  </Badge>
-                </Grid>
-              </Group.List>
-             
-              <Group.Head className="t-FS14 t-LH1_5 t-LH20 t-PT10 t-PB10 t-PL18">活动管理</Group.Head>
-              <Group.List>
-                <Grid col={3} className="t-BCf" square touchable>
-                  <Badge count={0} onClick={() => { t.handlerClickGrid('活动管理'); }}>
-                    <div className="demo" onClick={() => { t.handlerClickGrid('活动管理'); }}>
-                      <User fill={'#42A5F5'} />
-                      <div className="menu-title">活动管理</div>
-                    </div>
-                  </Badge>
-                </Grid>
-              </Group.List>
-
-              <Group.Head className="t-FS14 t-LH1_5 t-LH20 t-PT10 t-PB10 t-PL18">问题管理</Group.Head>
-              <Group.List>
-                <Grid col={3} className="t-BCf" square touchable>
-                  <Badge count={0} onClick={() => { t.handlerClickGrid('问题管理'); }}>
-                    <div className="demo" onClick={() => { t.handlerClickGrid('问题管理'); }}>
-                      <User fill={'#42A5F5'} />
-                      <div className="menu-title">问题管理</div>
-                    </div>
-                  </Badge>
-                </Grid>
-              </Group.List>
-
-              <Group.Head className="t-FS14 t-LH1_5 t-LH20 t-PT10 t-PB10 t-PL18">送样管理</Group.Head>
-              <Group.List>
-                <Grid col={3} className="t-BCf" square touchable>
-                  <Badge count={0} onClick={() => { t.handlerClickGrid('送样管理'); }}>
-                    <div className="demo" onClick={() => { t.handlerClickGrid('送样管理'); }}>
-                      <User fill={'#42A5F5'} />
-                      <div className="menu-title">送样管理</div>
-                    </div>
-                  </Badge>
-                </Grid>
-              </Group.List>
-            </div>
-          </ScrollView>
+        <div style={ scrollViewStyle } >
+          <Button style={ buttonTopStyle } display="inline"  onClick={ t.handlerClickGrid.bind(t,'/customer/list') }><Setting />客户管理</Button><br /> 
+          <Button style={ buttonOtherStyle } display="inline"  onClick={ t.handlerClickGrid.bind(t,'/chance/list') }><Setting />商机管理</Button><br /> 
+          <Button style={ buttonOtherStyle } display="inline"  onClick={ t.handlerClickGrid.bind(t,'/question/list') }><Setting />问题管理</Button><br /> 
+          <Button style={ buttonOtherStyle } display="inline"  onClick={ t.handlerClickGrid.bind(t,'/activity/list') }><Setting />出差报告</Button><br /> 
         </div> 
         <TabBar
           tabBarStyle={tabBarStyle}

@@ -15,11 +15,12 @@ import {
     CitySelectField,
     CalendarField,
     CascadeSelectField,
-    PickerField,PhotoField
+    PickerField,PhotoField,
+    NavBar,
 } from 'saltui';
 
 import { hashHistory } from 'react-router';
-import './PageCustomerEdit.less';
+import './PageCustomerDetail.less';
 
 const custLevelProps = [
     {value: '前10', text: '前10'}, 
@@ -49,7 +50,8 @@ export default class PageCustomerEdit extends Component {
     constructor(props) {
         super(props);
         let t = this;
-        
+        var winHeight = getScrollHigh(0, 1, 0);
+        var tabHeight = getScrollHighWithOther(0, 1, 0, 137);
         t.state = {
           baseInfo : {
                 "id": "",
@@ -69,27 +71,14 @@ export default class PageCustomerEdit extends Component {
           },
           links : [],
           chances: [],
-          questions : []
+          questions : [],
+          title:'客户详情',
+          isShow: true,
+          rightText: '',
+          className: '',
+          winHeight: winHeight,
+          tabHeight: tabHeight
         };
-        
-
-         dd.biz.navigation.setMenu({
-            backgroundColor : "#ADD8E6",
-            textColor : "#ADD8E611",
-            items : [
-              {
-                 "id":"1",//字符串
-                "iconId":"",//字符串，图标命名
-                "text":"客户详细信息"
-              }
-            ],
-            onSuccess: function(data) {
-           
-            },
-            onFail: function(err) {
-            }
-        });
-        
     }
 
     componentDidMount() {
@@ -149,106 +138,114 @@ export default class PageCustomerEdit extends Component {
         });
     }
 
+    handleOnLeftClick() {
+       hashHistory.goBack();
+    }
 
     render() {
         let t = this;
+        let scrollViewStyle = {'height': t.state.winHeight,'margin-top':'50px'};
+        let tableViewStyle = {'height': t.state.tabHeight };
+        
         return (
             <div className="t-FS16">
-              <Card mode="full" className="card-sence">
-                <div className="card-body">
-                  <div className="card-title">{ t.state.baseInfo.custName }</div>
-                </div>
-                <div className="card-footer">
-                  <div className="card-footer-meta">
-                    <span className="card-footer-meta-item">
-                      未更新天数：
-                      <span className="card-eye-count">{ t.state.baseInfo.noUpdateDays }</span>
-                    </span>
+              <NavBar title={t.state.title} isShow={t.state.isShow} rightText={ t.state.rightText } onLeftClick={t.handleOnLeftClick.bind(this)} />
+              <div style={ scrollViewStyle }>
+                <Card mode="full" className="card-sence">
+                  <div className="card-body">
+                    <div className="card-title">{ t.state.baseInfo.custName }</div>
                   </div>
-                  <div className="card-footer-extra">{ t.state.baseInfo.custStage }</div>
-                </div>
-              </Card>
-              <Tab active={'0'} showScroll>
-                <Tab.Item title="待审阅" >
-                  <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                      <TextField  readOnly label="客户名称"  value={ t.state.baseInfo.custName }/>
-                    </Group.List>
-                  </Group>
-                  <div className="t-MB10"></div>
+                  <div className="card-footer">
+                    <div className="card-footer-meta">
+                      <span className="card-footer-meta-item">
+                        未更新天数：
+                        <span className="card-eye-count">{ t.state.baseInfo.noUpdateDays }</span>
+                      </span>
+                    </div>
+                    <div className="card-footer-extra">{ t.state.baseInfo.custStage }</div>
+                  </div>
+                </Card>
+                <Tab active={'0'}>  
+                  <Tab.Item title="待审阅" style={ tableViewStyle }>
                     <Group>  
                       <Group.List lineIndent={18} className="content-FAR t-FS16">
-                        <TextField label="客户简称" readOnly  value={ t.state.baseInfo.custSimpleName }/>
+                        <TextField  readOnly label="客户名称"  value={ t.state.baseInfo.custName }/>
                       </Group.List>
                     </Group>
-                  <div className="t-MB10"></div>
-                  <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                      <TextField label="行业地位" readOnly  value={ t.state.baseInfo.custIndustryStatus } />
-                    </Group.List>
-                  </Group>
-                  <div className="t-MB10"></div>  
-                  <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                      <TextField label="客户阶段" readOnly  value={ t.state.baseInfo.custStage } />
-                    </Group.List>
-                  </Group>
-                  <div className="t-MB10"></div>
-                  <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                      <TextField label="产品中心" readOnly  value={ t.state.baseInfo.custCenter } />
-                    </Group.List>
-                  </Group>
-                  <div className="t-MB10"></div>
-                  <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                      <TextField label="客户来源" readOnly  value={ t.state.baseInfo.custSource } />
-                    </Group.List>
-                  </Group>
-                  <div className="t-MB10"></div>
-                  <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                      <TextField label="上年度营收（万元）" readOnly  value={ t.state.baseInfo.custIncomeLast } />
-                    </Group.List>
-                  </Group>
-                  <div className="t-MB10"></div>
-                  <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                      <TextField label="主营业务" readOnly  value={ t.state.baseInfo.custMainBusiness } />
-                    </Group.List>
-                  </Group>
-                  <div className="t-MB10"></div>
-                  <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                      <TextField label="公司地址" readOnly  value={ t.state.baseInfo.custAddress } />
-                    </Group.List>
-                  </Group>
-                  <div className="t-MB10"></div>
-                  <Group>  
-                    <Group.List lineIndent={18} className="content-FAR t-FS16">
-                      <TextField label="销售人员" readOnly  value={ t.state.baseInfo.custSalesman } />
-                    </Group.List>
-                  </Group>
-                  <div className="t-MB10"></div>
-                  <Button className="t-tabs-button" type="primary" display="inline" onClick={this.handleEditClick.bind(this)}>编    辑</Button>
-                
-                </Tab.Item>
-                <Tab.Item title="联系人" >
-                  <div>
-                   <h1>联系人</h1>
-                  </div>
-                </Tab.Item>
-                <Tab.Item title="商机" >
-                  <div>
-                   <h1>商机</h1>
-                  </div>
-                </Tab.Item>
-                <Tab.Item title="问题" >
-                  <div>
-                   <h1>问题</h1>
-                  </div>
-                </Tab.Item>  
-              </Tab>
+                    <div className="t-MB10"></div>
+                      <Group>  
+                        <Group.List lineIndent={18} className="content-FAR t-FS16">
+                          <TextField label="客户简称" readOnly  value={ t.state.baseInfo.custSimpleName }/>
+                        </Group.List>
+                      </Group>
+                    <div className="t-MB10"></div>
+                    <Group>  
+                      <Group.List lineIndent={18} className="content-FAR t-FS16">
+                        <TextField label="行业地位" readOnly  value={ t.state.baseInfo.custIndustryStatus } />
+                      </Group.List>
+                    </Group>
+                    <div className="t-MB10"></div>  
+                    <Group>  
+                      <Group.List lineIndent={18} className="content-FAR t-FS16">
+                        <TextField label="客户阶段" readOnly  value={ t.state.baseInfo.custStage } />
+                      </Group.List>
+                    </Group>
+                    <div className="t-MB10"></div>
+                    <Group>  
+                      <Group.List lineIndent={18} className="content-FAR t-FS16">
+                        <TextField label="产品中心" readOnly  value={ t.state.baseInfo.custCenter } />
+                      </Group.List>
+                    </Group>
+                    <div className="t-MB10"></div>
+                    <Group>  
+                      <Group.List lineIndent={18} className="content-FAR t-FS16">
+                        <TextField label="客户来源" readOnly  value={ t.state.baseInfo.custSource } />
+                      </Group.List>
+                    </Group>
+                    <div className="t-MB10"></div>
+                    <Group>  
+                      <Group.List lineIndent={18} className="content-FAR t-FS16">
+                        <TextField label="上年度营收（万元）" readOnly  value={ t.state.baseInfo.custIncomeLast } />
+                      </Group.List>
+                    </Group>
+                    <div className="t-MB10"></div>
+                    <Group>  
+                      <Group.List lineIndent={18} className="content-FAR t-FS16">
+                        <TextField label="主营业务" readOnly  value={ t.state.baseInfo.custMainBusiness } />
+                      </Group.List>
+                    </Group>
+                    <div className="t-MB10"></div>
+                    <Group>  
+                      <Group.List lineIndent={18} className="content-FAR t-FS16">
+                        <TextField label="公司地址" readOnly  value={ t.state.baseInfo.custAddress } />
+                      </Group.List>
+                    </Group>
+                    <div className="t-MB10"></div>
+                    <Group>  
+                      <Group.List lineIndent={18} className="content-FAR t-FS16">
+                        <TextField label="销售人员" readOnly  value={ t.state.baseInfo.custSalesman } />
+                      </Group.List>
+                    </Group>
+                    <div className="t-MB10"></div>
+                    <Button className="t-tabs-button" type="primary" display="inline" onClick={this.handleEditClick.bind(this)}>编    辑</Button>
+                  </Tab.Item>
+                  <Tab.Item title="联系人" >
+                    <div  style={ tableViewStyle }>
+                     <h1>联系人</h1>
+                    </div>
+                  </Tab.Item>
+                  <Tab.Item title="商机" >
+                    <div  style={ tableViewStyle }>
+                     <h1>商机</h1>
+                    </div>
+                  </Tab.Item>
+                  <Tab.Item title="问题" >
+                    <div  style={ tableViewStyle }>
+                     <h1>问题</h1>
+                    </div>
+                  </Tab.Item>  
+                </Tab>
+              </div>  
             </div>
         )
     }

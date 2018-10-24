@@ -30,7 +30,7 @@ export default ({ custId, onClick }) => (
           <Plus fill={'#fff'} />
         </VBox>
       </HBox>
-      <Grid col={3} className="t-BCf t-MB30" square noLine touchable>
+      <Grid col={3} className="t-BCf" square noLine touchable>
         <div className="item" onClick={onClick.bind(null, custId, 'sj')}>
           <User fill={'#42A5F5'} />
           <div className="menu-title">商机</div>
