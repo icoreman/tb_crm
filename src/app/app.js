@@ -14,12 +14,13 @@ import PageHome from 'pages/home';
 import PageFunc from 'pages/func';
 import PageActivityForm from 'pages/activity/form';
 import PageActivityList from 'pages/activity/list';
-import PageActivityAdd from 'pages/activity/add';
 import PageCustomerAdd from 'pages/customer/add';
 import PageCustomerDetail from 'pages/customer/detail';
+import PageCustomerEdit from 'pages/customer/edit';
 import PageCustomerList from 'pages/customer/list';
 import PageLinkForm from 'pages/link/form';
 import PageLinkScan from 'pages/link/scan';
+import PageLinkUpload from 'pages/link/upload';
 import PageChanceForm from 'pages/chance/form';
 import PageChanceList from 'pages/chance/list';
 import PageQuestionForm from 'pages/question/form';
@@ -50,8 +51,8 @@ Refast.use('fn', {
   history: history,
 });
 
-const Loading = () => <div className="kuma-loading" />;
-const Empty = () => <div>暂无数据</div>;
+const Loading = () => { return <div className="kuma-loading" ></div> };
+const Empty = () => { return <div>暂无数据</div> };
 
 // 修改 LogicRender 增加默认配置
 // 用来自定义Loading和Empty的样式
@@ -61,41 +62,25 @@ LogicRender.defaultProps.Loading = Loading;
 class App extends Component {
   constructor(props) {
     super(props);
-    let t = this;
+
     var url = window.location.href;
     if(isDev) {
-      $('#context').val('http://localhost:8080/flexoffice');
+      localStorage.context = 'http://localhost:8080/flexoffice';
       var token = url.substring(url.indexOf("token") + 6, url.indexOf('#'));
-      $("#token").val(token);
+      localStorage.token = token;
     } else {
       var params = url.split('&');
       var context = params[0].substring(0,params[0].indexOf('flexoffice') + 11);
       var agentid = params[1].split('=')[1];
       var code = params[2].split('=')[1];
-
-      $('#context').val(context);
-      getJWTToken(context,agentid,code,function(data){
-        if(data.result == 0) {
-          $("#token").val(data.token);
-          $("#userId").val(data.userId);
-          $("#ezplatformUserId").val(data.ezplatformUserId);
-          $("#ezplatformUserName").val(data.ezplatformUserName);
-          $("#ezplatformOrgId").val(data.ezplatformOrgId);
-          $("#ezplatformOrgName").val(data.ezplatformOrgName);
-          $("#moblieMainPageUrl").val(data.moblieMainPageUrl);
-          t.setState({
-            title: data.ezplatformUserName
-          });
-        } else {
-          alert("获取用户信息失败，请重试或者联系管理员！");
-        }
-      });
-      
       var baseUrl = url.substring(0,url.indexOf('#'));
-      getJSToken(context,baseUrl,agentid,null);
+
+      localStorage.context = context;
+      localStorage.agentid = agentid;
+      localStorage.code = code;
+      localStorage.baseUrl = baseUrl;
     }
    
-
     this.state = {
       title: 'CRM',
     };
@@ -118,14 +103,15 @@ render(
       <Route path="/func" component={PageFunc} />
       <Route path="/activity/form" component={PageActivityForm} />
       <Route path="/activity/list" component={PageActivityList} />
-      <Route path="/activity/add" component={PageActivityAdd} />
       <Route path="/chance/form" component={PageChanceForm} />
       <Route path="/chance/list" component={PageChanceList} />
       <Route path="/customer/detail" component={PageCustomerDetail} />
       <Route path="/customer/add" component={PageCustomerAdd} />
+      <Route path="/customer/edit" component={PageCustomerEdit} />
       <Route path="/customer/list" component={PageCustomerList} />
       <Route path="/link/form" component={PageLinkForm} />
       <Route path="/link/scan" component={PageLinkScan} />
+      <Route path="/link/upload" component={PageLinkUpload} />
       <Route path="/question/form" component={PageQuestionForm} />
       <Route path="/question/list" component={PageQuestionList} />
     </Route>

@@ -1,6 +1,10 @@
 import './NoData.less';
 import { Boxs } from 'saltui';
-const { VBox, Box } = Boxs;
+
+const {
+  HBox,VBox,Box
+} = Boxs;
+e
 import { noDataImage } from '../../app/variables';
 
 export default () => (

@@ -5,7 +5,7 @@ import { UploadCore, Events, Status, VERSION } from 'uploadcore';
 
 import './upload.less';
 
-export default class PageHome extends Component {
+export default class Upload extends Component {
 
 
 
@@ -49,8 +49,8 @@ export default class PageHome extends Component {
     
     
     var dir = props.dir;
-    var context = document.getElementById("context").value;
-    var token = document.getElementById("token").value;
+    var context = localStorage.context;
+    var token = props.token;
     this.state = {
       uploadType:uploadType,
       accept:accept,
@@ -77,8 +77,7 @@ export default class PageHome extends Component {
     };
 
     const up = new UploadCore(param);
-    up
-    .on(Events.FILE_UPLOAD_PREPARING, (request) => {
+    up.on(Events.FILE_UPLOAD_PREPARING, (request) => {
         request.setHeader("Authorization", "Bearer "+t.state.token);
         request.setParam('dir', t.state.dir);
         request.setParam('token', t.state.token);
@@ -158,7 +157,6 @@ export default class PageHome extends Component {
         }
       })
       .on(Events.FILE_UPLOAD_COMPLETED, (file) => {
-
         if (file.getStatus() === Status.SUCCESS) {
           var result = file.response.getJson();
           if (result.code == -1) {
@@ -200,7 +198,8 @@ export default class PageHome extends Component {
       });
 
     const picker = up.getPickerCollector();
-    picker.addArea( document.getElementById("clickArea") );
+    $("#clickArea").html('');
+    picker.addArea(document.getElementById("clickArea"));
   }
 
     //计算大小

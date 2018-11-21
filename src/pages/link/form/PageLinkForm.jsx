@@ -6,10 +6,10 @@ import {
     Group,DatetimeField,
     TextField,
     TextareaField,
-    NumberField,
     SelectField,
     Button,
     Toast,
+    Dialog
 } from 'saltui';
 
 import './PageLinkForm.less';
@@ -28,23 +28,25 @@ export default class PageLinkForm extends Component {
 
     constructor(props) {
       super(props);
-      console.log(props);
       
       let t = this;
 
-      var token = document.getElementById("token").value;
+      var token = localStorage.token;
       let query = this.props.location.query;
       var custId = query.custId;
+      var custName = query.custName;
       var type = query.type;
       var id = query.id;
+
       var readOnly = type == 'get' ? true : false;
 
       t.state = {
         token: token,
         type: type,
         readOnly: readOnly,
+        custName: custName,
         data: {
-          custId: custId,
+          custId: custId,  
           id: id,
           linkName: '',
           linkEmail: '',
@@ -63,17 +65,24 @@ export default class PageLinkForm extends Component {
     }
 
     componentDidMount() {
-      var type = this.state.type;
+      const t = this;
+      let type = t.state.type;
       if(type == 'get' || type == 'edit') {
-        var token = this.state.token;
-        if(token == "" || token == undefined) {
-          alert("没有token");
+        var token = t.state.token;
+        if(!token) {
+          Toast.show({
+            type: 'error',
+            content: '登录过期，请重新登录！'
+          });
           return;
         }
 
-        var id = this.state.data.id;
-        if(id == "" || id == undefined) {
-          alert("没有id");
+        var id = t.state.data.id;
+        if(!id) {
+          Toast.show({
+            type: 'error',
+            content: '数据错误，请重试！'
+          });
           return;
         }
 
@@ -82,67 +91,94 @@ export default class PageLinkForm extends Component {
           id: id
         })
         .then((content) => {
-          this.setState({
-              data: content
+          let linkSex,linkFunction;
+
+          sexProps.map((sex) => {
+            if(sex.value == content.linkSex) {
+              linkSex = sex;
+            }
           });
+
+          linkFunctionProps.map((func) => {
+            if(func.value == content.linkFunction) {
+              linkFunction = func;
+            }
+          });
+
+          t.setState({
+            data: content
+          });
+
+          t.dealDefaultValue(content.linkSex, sexProps, 'linkSex');
+          t.dealDefaultValue(content.linkFunction, linkFunctionProps, 'linkFunction');
         })
         .catch((error) => {
-            // 失败 or 有异常被捕获
-          this.setState({
-            selectOfCenter:[]
-          });
           Toast.show({
             type: 'error',
-            content: '查询出错'
+            content: '查询数据出错，请重试！'
           });
         });
       }
     }
 
-    handleSubmitForm(saveType) {
-      if(saveType == 1) {
+    dealDefaultValue = (defaultValue, defaultProps, label) => {
+      const t = this;
+      if(!!defaultValue) {
+        defaultProps.map((prop) => {
+          if(prop.value == defaultValue) {
+            let data = t.state.data;
+            data[label] = prop;
+            t.setState({
+              data: data
+            });
+          }
+        });
+      }
+    }
+
+    handleSubmitForm = (saveType) => {
+      const t = this;
+      if(saveType == 0) {
         hashHistory.goBack();
         return;
       }
 
-      for (let key in this.state.data) {
-        if (/^required\d+$/.test(key) && !this.state.data[key]) {
-          Toast.show({
-            type: 'error',
-            content: '请填写必填项',
-            onHide: function () {
-            }
-          });
-          return;
-        }
-      }
-
-      var token = this.state.token;
-      if(token == "" || token == undefined) {
-        alert("没有token");
+      let token = t.state.token;
+      if(!token) {
+        Toast.show({
+          type: 'error',
+          content: '登录过期，请重新登录'
+        });
         return;
       }
 
-      var data = this.state.data;
-      var custId = data.custId;
-      if(custId == "" || custId == undefined) {
-        alert("custId为空，请重试");
+      let data = t.state.data;
+      let custId = data.custId;
+      if(!custId) {
+        Toast.show({
+          type: 'error',
+          content: 'custId为空，请重试!'
+        });
         return;
       }
 
-      if(this.state.type == 'create') {
+      if(!t.checkParam()) {
+        return;
+      }
+
+      if(t.state.type == 'create') {
         DB.CrmLinkAPI.create({
           token: token,
           custId: custId,
           linkName: data.linkName,
           linkTele: data.linkTele,
           linkEmail: data.linkEmail,
-          linkSex: data.linkSex.value,
+          linkSex: !data.linkSex ? null : data.linkSex.value,
           linkWorkAge: data.linkWorkAge,
           linkDep:data.linkDep,
           linkAge:data.linkAge,
           linkPosition:data.linkPosition,
-          linkFunction: data.linkFunction.value,
+          linkFunction: !data.linkFunction ? null : data.linkFunction.value,
           linkHobby:data.linkHobby,
           linkAttention: data.linkAttention,
           linkRemark: data.linkRemark
@@ -151,13 +187,13 @@ export default class PageLinkForm extends Component {
           Toast.show({
             type: 'success',
             content: '保存成功',
-            onDidHide() {
-              hashHistory.goBack();
-            }
           });
+
+          setTimeout(() => {
+            hashHistory.goBack();
+          }, 1000);
         })
         .catch((error) => {
-          // 失败 or 有异常被捕获
           Toast.show({
             type: 'error',
             content: '保存失败'
@@ -167,16 +203,16 @@ export default class PageLinkForm extends Component {
         DB.CrmLinkAPI.update({
           token: token,
           custId: custId,
-          id: id,
+          id: data.id,
           linkName: data.linkName,
           linkTele: data.linkTele,
           linkEmail: data.linkEmail,
-          linkSex: data.linkSex.value,
+          linkSex: !data.linkSex ? null : data.linkSex.value,
           linkWorkAge: data.linkWorkAge,
           linkDep:data.linkDep,
           linkAge:data.linkAge,
           linkPosition:data.linkPosition,
-          linkFunction: data.linkFunction.value,
+          linkFunction: !data.linkFunction ? null : data.linkFunction.value,
           linkHobby:data.linkHobby,
           linkAttention: data.linkAttention,
           linkRemark: data.linkRemark
@@ -184,14 +220,14 @@ export default class PageLinkForm extends Component {
         .then((content) => {
           Toast.show({
             type: 'success',
-            content: '保存成功',
-            onDidHide() {
-              hashHistory.goBack();
-            }
+            content: '保存成功',       
           });
+
+          setTimeout(() => {
+            hashHistory.goBack();
+          }, 1000);
         })
         .catch((error) => {
-          // 失败 or 有异常被捕获
           Toast.show({
             type: 'error',
             content: '保存失败'
@@ -199,10 +235,43 @@ export default class PageLinkForm extends Component {
         });
       }
     }
+
+    checkParam = () => {
+      const t = this;
+      let data  = t.state.data;
+      if(!t.checkParamNull(data,'linkName','请填写联系人姓名！')) {
+        return false;
+      }
+      if(!t.checkParamNull(data,'linkTele','请填写联系方式！')) {
+        return false;
+      }
+      if(!t.checkParamNull(data,'linkEmail','请填写邮件！')) {
+        return false;
+      }
+      if(!t.checkParamNull(data,'linkPosition','请填写职务！')) {
+        return false;
+      }
+      if(!t.checkParamNull(data,'linkFunction','请填写智能域！')) {
+        return false;
+      }
+
+      return true;
+    }
+
+    checkParamNull = (data,label,text) => {
+      if(!data[label]) {
+        Dialog.alert({
+          title: '提示',
+          content: text
+        });
+        return false;
+      }
+      return true;
+    }
     
-    handleChange(label, value) {
-      let t = this;
-      var data = t.state.data;
+    handleChange = (label, value) => {
+      const t = this;
+      let data = t.state.data;
 
       data[label] = value;
       t.setState({
@@ -210,10 +279,10 @@ export default class PageLinkForm extends Component {
       });
     }
 
-    handleNumberChange(label, value) {
-      let t = this;
-      var data = t.state.data;
-      data[label] = value.replace(/\.$/, '').replace(/^0*([0-9]+)/, '$1');
+    handleNumberChange = (label, value) => {
+      const t = this;
+      let data = t.state.data;
+      data[label] = value.replace(/^0*([0-9]+)/, '$1');
 
       t.setState({
           data: data
@@ -222,29 +291,34 @@ export default class PageLinkForm extends Component {
 
 
     render() {
-        let t = this;
+        const t = this;
         return (
             <div className="t-FS16">
-              <Group>  
+              <Group> 
+                <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
-                    <TextField required key="linkName" label="姓名" placeholder="请输入" value={ t.state.data.linkName }
-                      onChange={t.handleChange.bind(this, 'linkName')} readOnly={ t.state.readOnly } />
+                  <TextField key='custName' label="客户名称" value={ t.state.custName } readOnly/>
+                </Group.List> 
+                <div className="t-MB3"></div>
+                <Group.List lineIndent={18} className="content-FAR t-FS16">
+                    <TextField key="linkName" required label="姓名" placeholder="请输入" value={ t.state.data.linkName }
+                      onChange={t.handleChange.bind(t, 'linkName')} readOnly={ t.state.readOnly } />
                 </Group.List>
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
-                  <TextField key='linkTele' label="联系方式" placeholder="请输入" value={ t.state.data.linkTele }
-                    onChange={t.handleChange.bind(this, 'linkTele')} readOnly={ t.state.readOnly }/>
+                  <TextField key='linkTele' required label="联系方式" placeholder="请输入" value={ t.state.data.linkTele }
+                    onChange={t.handleChange.bind(t, 'linkTele')} readOnly={ t.state.readOnly }/>
                 </Group.List>
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
-                  <TextField key='linkEmail' label="邮件" placeholder="请输入" value={ t.state.data.linkEmail }
-                    onChange={t.handleChange.bind(this, 'linkEmail')} readOnly={ t.state.readOnly }/>
+                  <TextField key='linkEmail' required label="邮件" placeholder="请输入" value={ t.state.data.linkEmail }
+                    onChange={t.handleChange.bind(t, 'linkEmail')} readOnly={ t.state.readOnly }/>
                 </Group.List>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
                    <SelectField
                     label="性别"
                     options={ sexProps }
-                    onSelect={t.handleChange.bind(this, 'linkSex')}
+                    onSelect={t.handleChange.bind(t, 'linkSex')}
                     value={t.state.data.linkSex}
                     placeholder="请选择"
                     readOnly={ t.state.readOnly }/>
@@ -252,22 +326,22 @@ export default class PageLinkForm extends Component {
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
                  <TextField key='linkWorkAge' label="工龄（年）" placeholder="请输入" value={ t.state.data.linkWorkAge }
-                    onChange={t.handleChange.bind(this, 'linkWorkAge')} readOnly={ t.state.readOnly } />
+                    onChange={t.handleChange.bind(t, 'linkWorkAge')} readOnly={ t.state.readOnly } />
                 </Group.List>
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
                  <TextField key='linkDep' label="部门" placeholder="请输入" value={ t.state.data.linkDep }
-                    onChange={t.handleChange.bind(this, 'linkDep')} readOnly={ t.state.readOnly } />
+                    onChange={t.handleChange.bind(t, 'linkDep')} readOnly={ t.state.readOnly } />
                 </Group.List>
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
                  <TextField key='linkAge' label="年龄" placeholder="请输入" value={ t.state.data.linkAge }
-                    onChange={t.handleChange.bind(this, 'linkAge')} readOnly={ t.state.readOnly } />
+                    onChange={t.handleChange.bind(t, 'linkAge')} readOnly={ t.state.readOnly } />
                 </Group.List>
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
-                 <TextField key='linkPosition' label="职务" placeholder="请输入" value={ t.state.data.linkPosition }
-                    onChange={t.handleChange.bind(this, 'linkPosition')} readOnly={ t.state.readOnly } />
+                 <TextField key='linkPosition' required label="职务" placeholder="请输入" value={ t.state.data.linkPosition }
+                    onChange={t.handleChange.bind(t, 'linkPosition')} readOnly={ t.state.readOnly } />
                 </Group.List>
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
@@ -275,7 +349,7 @@ export default class PageLinkForm extends Component {
                     required
                     label="职能域"
                     options={ linkFunctionProps }
-                    onSelect={t.handleChange.bind(this, 'linkFunction')}
+                    onSelect={t.handleChange.bind(t, 'linkFunction')}
                     value={t.state.data.linkFunction}
                     placeholder="请选择"
                     readOnly={ t.state.readOnly }/>
@@ -283,26 +357,32 @@ export default class PageLinkForm extends Component {
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
                  <TextField key='linkHobby' label="爱好" placeholder="请输入" value={ t.state.data.linkHobby }
-                    onChange={t.handleChange.bind(this, 'linkHobby')} readOnly={ t.state.readOnly } />
+                    onChange={t.handleChange.bind(t, 'linkHobby')} readOnly={ t.state.readOnly } />
                 </Group.List>
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
                   <TextareaField key='linkHobby' label="沟通策略及注意事项" placeholder="请输入" value={ t.state.data.linkAttention }
                     minRows={2} maxRows={5}
-                    onChange={t.handleChange.bind(this, 'linkAttention')} readOnly={ t.state.readOnly } />
+                    onChange={t.handleChange.bind(t, 'linkAttention')} readOnly={ t.state.readOnly } />
+                </Group.List>
+                <div className="t-MB3"></div>
+                <Group.List lineIndent={18} className="content-FAR t-FS16">
+                  <TextareaField key='linkHobby' label="备注" placeholder="请输入" value={ t.state.data.linkRemark }
+                    minRows={2} maxRows={5}
+                    onChange={t.handleChange.bind(t, 'linkRemark')} readOnly={ t.state.readOnly } />
                 </Group.List>
               </Group>
               <div className="t-MB3"></div>
               <div style={{padding: '30px 15px'}}>
-                <LogicRender show={ t.state.type == 'edit' | t.state.type == 'create'  } >
+                <LogicRender show={ 'get' != t.state.type } >
                   <Button.Group>
-                   <Button type="secondary" display="inline" onClick={t.handleSubmitForm.bind(this,1)}>取消</Button>
-                   <Button type="primary" display="inline" onClick={t.handleSubmitForm.bind(this,2)}>保存</Button>
+                   <Button type="secondary" display="inline" onClick={t.handleSubmitForm.bind(t,0)}>取消</Button>
+                   <Button type="primary" display="inline" onClick={t.handleSubmitForm.bind(t,2)}>保存</Button>
                   </Button.Group>
                 </LogicRender>   
-                <LogicRender show={ t.state.type == 'get' } >
+                <LogicRender show={ 'get' == t.state.type } >
                   <Button.Group>
-                    <Button type="secondary" display="inline" onClick={t.handleSubmitForm.bind(this,1)}>关闭</Button>
+                    <Button type="secondary" display="inline" onClick={t.handleSubmitForm.bind(t,0)}>关闭</Button>
                   </Button.Group>   
                 </LogicRender> 
               </div>

@@ -47,11 +47,73 @@ context.create('CrmUserAPI', {
   },
   getUserNew: {
     url: URLS.crmUser.getUserNew,
-    method:'GET',
+    method:'GET'
   },
   getWXJsInfo: {
     url: URLS.crmUser.getWXJsInfo,
     method:'GET',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    }
+  },
+  getUserInfoByScope: {
+    url: URLS.crmUser.getUserInfoByScope,
+    method:'GET',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    }
+  }
+});
+
+context.create('CrmActivityAPI', {
+  getNumbers: {
+    url: URLS.activity.getNumbers,
+    method:'GET',
+    overrideSelfConcurrent: true
+  },
+  get: {
+    url: URLS.activity.get,
+    method:'GET',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    }
+  },
+  create: {
+    url: URLS.activity.create,
+    method:'POST',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    }
+  },
+  update: {
+    url: URLS.activity.update,
+    method:'POST',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    }
+  },
+  getChanTable: {
+    url: URLS.activity.getChanTable,
+    method:'GET',
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    }
+  },
+  deleteQuesOrChan: {
+    url: URLS.activity.deleteQuesOrChan,
+    method:'POST',
     willFetch() {
        Toast.show({
         content: <Loading />
@@ -80,6 +142,16 @@ context.create('CrmCustomerAPI', {
       });
     }
   },
+  update: {
+    url: URLS.customer.update,
+    method:'POST',
+    ignoreSelfConcurrent: true,
+    willFetch() {
+       Toast.show({
+        content: <Loading />
+      });
+    }
+  },
   checkIsExistByName: {
     url: URLS.customer.checkIsExistByName,
     method:'POST',
@@ -92,9 +164,18 @@ context.create('CrmCustomerAPI', {
   },
   getCustomer: {
     url: URLS.customer.getCustomer,
+    method:'GET',
+    overrideSelfConcurrent: true
+  },
+  getNumbers: {
+    url: URLS.customer.getNumbers,
     method:'POST',
     overrideSelfConcurrent: true
-  }
+  },
+  getCustomerOfPass: {
+    url: URLS.customer.getCustomerOfPass,
+    method:'GET'
+  },
 });
 
 context.create('CrmLinkAPI', {
@@ -163,6 +244,11 @@ context.create('CrmChanceAPI', {
         content: <Loading />
       });
     }
+  },
+  getNumbers: {
+    url: URLS.chance.getNumbers,
+    method:'POST',
+    overrideSelfConcurrent: true
   }
 });
 
@@ -193,6 +279,12 @@ context.create('CrmQustionAPI', {
         content: <Loading />
       });
     }
+  },
+  getNumbers: {
+    url: URLS.question.getNumbers,
+    method:'POST',
+    overrideSelfConcurrent: true
   }
 });
+
 export default context.api;

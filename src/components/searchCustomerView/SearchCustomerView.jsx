@@ -21,7 +21,7 @@ import './SearchCustomerView.less';
 export default class SearchCustomerView extends Component {
   constructor(props) {
     super(props);
-    let token = document.getElementById("token").value;
+    let token = localStorage.token;
     let scrollViewHeight = getScrollHighWithOther(0, 0, 0, 80);
 
     this.state = {
@@ -29,19 +29,20 @@ export default class SearchCustomerView extends Component {
       selectOfCustomer: [],
       showOfCustomer: [],
       scrollViewHeight: scrollViewHeight,
-      defaultValue: props.defaultValue
+      defaultValue: props.defaultValue,
+      type: props.type
     };
   }
 
   handleClickCell(customer) {
-    let t = this;
+    const t = this;
     t.props.clickCell(customer);
   }
 
   render() {
-    let t = this;
+    const t = this;
     var token = t.state.token;
-    if(token == "" || token == undefined) {
+    if(!token) {
       alert("没有token");
       return;
     }
@@ -55,18 +56,15 @@ export default class SearchCustomerView extends Component {
       searchDelay: 350,
       value: t.state.defaultValue,
       onEnter: () => {
-        if(showOfCustomer.length > 0) {
-          return;
-        }
         DB.CrmCustomerAPI.getCustomer({
           token: token,
-          type: ''
+          type: t.state.type
         })
         .then((content) => {
           t.setState({
               selectOfCustomer: content
           });
-          if(t.state.defaultValue.length > 0) {
+          if(!t.state.defaultValue) {
             let i = 0;
             content.forEach(function (customer,index){
               if(customer.text.indexOf(t.state.defaultValue) > -1) {
@@ -92,7 +90,7 @@ export default class SearchCustomerView extends Component {
       },
       onSearch: (value) => {
         var selectOfCustomer = t.state.selectOfCustomer;
-        if(value == '') {
+        if(!value) {
           showOfCustomer = selectOfCustomer;
         } else {
           showOfCustomer = [];
@@ -118,7 +116,7 @@ export default class SearchCustomerView extends Component {
               {
                 showOfCustomer.map(function (customer) {
                   return (
-                    <Cell access onClick={ t.handleClickCell.bind(t,customer) }>
+                    <Cell key={ customer.id } access onClick={ t.handleClickCell.bind(t,customer) }>
                       <CellBody>
                         { customer.text }
                       </CellBody>
@@ -127,7 +125,6 @@ export default class SearchCustomerView extends Component {
                   );
                 })
               }
-            
           </Cells>
         </Scroller>
       </div>

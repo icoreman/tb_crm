@@ -10,6 +10,7 @@ import Plus from 'salt-icon/lib/Plus';
 import Map from 'salt-icon/lib/Map';
 import Star from 'salt-icon/lib/Star';
 import Setting from 'salt-icon/lib/Setting';
+import Upload from 'components/upload';
 
 import { URLS } from '../../app/variables';
 
@@ -18,7 +19,7 @@ import './HomeTabPopView.less';
 export default class HomeTabPopView extends Component {
   constructor(props) {
     super(props);
-    let token = document.getElementById("token").value;
+    let token = localStorage.token;
     this.state = {
       token:token
     };
@@ -31,21 +32,14 @@ export default class HomeTabPopView extends Component {
 
   handleScan() {
     $(".t-popup-mask").parent().parent().hide();
-    $("input[type='file']").click();
+    hashHistory.push('/link/upload');
   }
 
   render() {
     let t = this;
-    var options = {
-      baseUrl: URLS.common.createFile,
-      param:{
-        token: t.state.token,
-        dir: 'dist/image'
-      }
-    };
 
     return (
-      <div ref="HomeTabPopView">
+      <div>
         <Grid col={2} className="t-BCf t-MB1" noLine touchable>
           <div className="pop_item" onClick={ t.handleClickItem.bind(t, '/customer/add')}>
            <Button type="danger"><Setting />新建客户</Button>
@@ -64,7 +58,7 @@ export default class HomeTabPopView extends Component {
             <Time fill={'#FF8A65'} />
             <div className="menu-title">新建问题</div>
           </div>
-          <div className="pop_item" onClick={ t.handleClickItem.bind(t, '/activity/add') }>
+          <div className="pop_item" onClick={ t.handleClickItem.bind(t, '/activity/form?type=create') }>
             <Star fill={'#EA80FC'} />
             <div className="menu-title">新建出差报告</div>
           </div>

@@ -14,6 +14,7 @@ import {
     CheckboxField,
     RadioField,
     Toast,
+    Dialog,
     SwitchField,
     CitySelectField,
     CalendarField,
@@ -29,9 +30,9 @@ const {
 } = Button;
 
 const {
-    custLevelProps,
-    custSourceProps,
-    custAreaProps
+  custLevelProps,
+  custSourceProps,
+  custAreaProps
 } = selectKeyValues;
 
 export default class PageCustAdd extends Component {
@@ -39,18 +40,19 @@ export default class PageCustAdd extends Component {
     constructor(props) {
         super(props);
         let t = this;
-        var token = document.getElementById("token").value;
-
+        var token = localStorage.token;
+        var ezplatformUserName = localStorage.ezplatformUserName;
         t.state = {
           token: token,
+          ezplatformUserName: ezplatformUserName,
           data: {
             custName: '',
             custAbbreviation: '',
-            custSalesman: '',
             custCenter: '',
             custArea:'',
             custAddress:'',
             custIncomeLast:'',
+            custDemandNum: '',
             custIndustryStatus: '',
             custMainBusiness:'',
             custSource: ''
@@ -61,7 +63,7 @@ export default class PageCustAdd extends Component {
 
     componentDidMount() {
       var token = this.state.token;
-      if(token == "" || token == undefined) {
+      if(!token) {
         alert("没有token");
         return;
       }
@@ -83,46 +85,43 @@ export default class PageCustAdd extends Component {
           content: '查询出错'
         });
       });
-      
     }
-    handleSubmitForm(saveType) {
-      let t = this;
-      for (let key in t.state.data) {
-          if (/^required\d+$/.test(key) && !t.state.data[key]) {
-              Toast.show({
-                  type: 'error',
-                  content: '请填写必填项',
-                  onHide: function () {
-                  }
-              });
-              return;
-          }
-      }
 
-      var token = t.state.token;
-      if(token == "" || token == undefined) {
+    componentWillUnmount () {
+      Dialog.hide();
+      Toast.hide(); 
+    }
+
+
+    handleSubmitForm(saveType) {
+      const t = this;
+      if(!t.checkParam()) {
+        return;
+      }
+      
+      let data = t.state.data;
+
+      const token = t.state.token;
+      if(!token) {
         alert("没有token");
         return;
       }
-      var data = t.state.data;
-      console.log(data);
-
+      
       DB.CrmCustomerAPI.create({
         token: token,
         custName: data.custName,
         custAbbreviation: data.custAbbreviation,
-        custSalesman: data.custSalesman,
         custCenter: data.custCenter.value,
         custArea: data.custArea.value,
         custAddress:data.custAddress,
-        custIncomeLast:data.custIncomeLast,
+        custIncomeLast:data.custIncomeLast.replace(/\,/g,""),
+        custDemandNum: data.custDemandNum.replace(/\,/g,""),
         custIndustryStatus: data.custIndustryStatus.value,
         custMainBusiness:data.custMainBusiness,
         custSource: data.custSource.value,
         saveType: saveType
       })
       .then((content) => {
-        console.log(content);
         hashHistory.goBack();
       })
       .catch((error) => {
@@ -132,13 +131,60 @@ export default class PageCustAdd extends Component {
           content: '保存失败'
         });
       });
+    }
 
+    checkParam = () => {
+      const t = this;
+      let data  = t.state.data;
+      if(!t.checkParamNull(data,'custName','请填写客户名称！')) {
+        return false;
+      }
+      
+      if(!t.checkParamNull(data,'custCenter','请选择产品中心！')) {
+        return false;
+      }
+
+      if(!t.checkParamNull(data,'custArea','请选择客户区域！')) {
+        return false;
+      }
+
+      if(!t.checkParamNull(data,'custIncomeLast','请填写上年度营收（万元）！')) {
+        return false;
+      }
+
+      if(!t.checkParamNull(data,'custDemandNum','请填写年PCBA采购规模（万元）！')) {
+        return false;
+      }
+
+      if(!t.checkParamNull(data,'custIndustryStatus','请选择行业地位！')) {
+        return false;
+      }
+
+      if(!t.checkParamNull(data,'custMainBusiness','请填写主营业务！')) {
+        return false;
+      }
+
+      if(!t.checkParamNull(data,'custSource','请选择客户来源！')) {
+        return false;
+      }
+
+      return true;
+    }
+
+    checkParamNull = (data,label,text) => {
+      if(!data[label]) {
+        Dialog.alert({
+          title: '提示',
+          content: text
+        });
+        return false;
+      }
+      return true;
     }
     
     handleChange(label, value) {
       let t = this;
       var data = t.state.data;
-      console.log(value);
       data[label] = value;
       t.setState({
           data: data
@@ -148,7 +194,7 @@ export default class PageCustAdd extends Component {
     handleNumberChange(label, value) {
       let t = this;
       var data = t.state.data;
-      data[label] = value.replace(/\.$/, '').replace(/^0*([0-9]+)/, '$1');
+      data[label] = value.replace(/^0*([0-9]+)/, '$1');
 
       t.setState({
           data: data
@@ -171,10 +217,9 @@ export default class PageCustAdd extends Component {
                     onChange={t.handleChange.bind(this, 'custAbbreviation')} />
                 </Group.List>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
-                  <TextField required label="销售人员"
+                  <TextField required label="销售人员" readOnly
                     placeholder="请输入" 
-                    value={t.state.data.custSalesman}
-                    onChange={t.handleChange.bind(this,'custSalesman')}/>
+                    value={ t.state.ezplatformUserName }/>
                 </Group.List>
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
@@ -184,8 +229,7 @@ export default class PageCustAdd extends Component {
                     options={ t.state.selectOfCenter }
                     onSelect={t.handleChange.bind(this, 'custCenter')}
                     value={t.state.data.custCenter}
-                    placeholder="请选择"
-                    />
+                    placeholder="请选择" />
                 </Group.List>
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
@@ -193,17 +237,16 @@ export default class PageCustAdd extends Component {
                     required
                     label="客户区域"
                     options={custAreaProps}
-                    onSelect={t.handleChange.bind(this, 'custArea')}
+                    onSelect={t.handleChange.bind(t, 'custArea')}
                     value={t.state.data.custArea}
-                    placeholder="请选择"
-                    />
+                    placeholder="请选择" />
                 </Group.List>
                 <div className="t-MB3"></div>
                   <Group.List lineIndent={18} className="content-FAR t-FS16">
-                    <TextField required label="公司地址"
+                    <TextField label="公司地址"
                       placeholder="请输入" 
                       value={t.state.data.custAddress}
-                      onChange={t.handleChange.bind(this,'custAddress')}/>
+                      onChange={t.handleChange.bind(t,'custAddress')}/>
                 </Group.List>
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
@@ -213,17 +256,32 @@ export default class PageCustAdd extends Component {
                     placeholder="请输入" 
                     delimiter=","
                     fixedNum="2"
+                    formatOnBlur
                     value={ t.state.data.custIncomeLast }
-                    onChange={ t.handleNumberChange.bind(this,'custIncomeLast') }
+                    onChange={ t.handleNumberChange.bind(t,'custIncomeLast') }
                   />
                 </Group.List>
+                <div className="t-MB3"></div>
+                <Group.List lineIndent={18} className="content-FAR t-FS16">
+                  <NumberField required 
+                    label="年PCBA采购规模（万元）"
+                    type="money"
+                    placeholder="请输入" 
+                    delimiter=","
+                    fixedNum="2"
+                    formatOnBlur
+                    value={ t.state.data.custDemandNum }
+                    onChange={ t.handleNumberChange.bind(t,'custDemandNum') }
+                  />
+                </Group.List>
+
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
                   <SelectField
                     required
                     label="行业地位"
                     options={custLevelProps}
-                    onSelect={t.handleChange.bind(this, 'custIndustryStatus')}
+                    onSelect={t.handleChange.bind(t, 'custIndustryStatus')}
                     value={t.state.data.custIndustryStatus}
                     placeholder="请选择"
                     />
@@ -233,14 +291,14 @@ export default class PageCustAdd extends Component {
                   <TextField required label="主营业务"
                     placeholder="请输入" 
                     value={ t.state.data.custMainBusiness }
-                    onChange={t.handleChange.bind(this,'custMainBusiness')}/>
+                    onChange={t.handleChange.bind(t,'custMainBusiness')}/>
                 </Group.List>
                 <div className="t-MB3"></div>
                 <Group.List lineIndent={18} className="content-FAR t-FS16">
                   <SelectField required
                     label="客户来源"
                     options={custSourceProps}
-                    onSelect={t.handleChange.bind(this, 'custSource')}
+                    onSelect={t.handleChange.bind(t, 'custSource')}
                     value={t.state.data.custSource}
                     placeholder="请选择"
                   />
@@ -249,8 +307,8 @@ export default class PageCustAdd extends Component {
               <div className="t-MB3"></div>
               <div style={{padding: '30px 15px'}}>
                   <Button.Group>
-                    <Button type="secondary" display="inline" onClick={t.handleSubmitForm.bind(this,1)}>暂存</Button>
-                    <Button type="primary" display="inline" onClick={t.handleSubmitForm.bind(this,2)}>保存</Button>
+                    <Button type="secondary" display="inline" onClick={t.handleSubmitForm.bind(t,1)}>暂存</Button>
+                    <Button type="primary" display="inline" onClick={t.handleSubmitForm.bind(t,2)}>保存</Button>
                   </Button.Group>
               </div>
             </div>

@@ -1,5 +1,3 @@
-document.getElementById('context').value = "";
-
 var hash = 'f09cf7bb84a74fbe5285';
 var _config;
 var url = window.location.href;
@@ -7,49 +5,6 @@ var indexpos = url.indexOf("#");
 if (indexpos > 0) {
 	url = url.substring(0, indexpos);
 }
-
-
-//获取js授权
-function jsready(callback){			
-			var url = window.location.href;
-			var indexpos = url.indexOf("#");
-			if (indexpos > 0) {
-				url = url.substring(0, indexpos);
-			}
-			$.post("/pub/weixin/getJSToken", {
-				"url" : url,
-        "corpId" : 'ww8b1aae2fdfc5a4eb',
-        "corpsecret" : 'T0WFTA3NsRspw3gT63mjfnxT9tgtLU1vQKGaqcfxznI'
-			}, function(result) {
-				_config = JSON.parse(result);
-
-				wx.config({
-          beta: true,
-		      debug: false,
-		      appId: _config.corpid,
-		      timestamp:  _config.timestamp,
-		      nonceStr:  _config.noncestr,
-		      signature:  _config.signature,
-		      jsApiList: [
-            'hideMenuItems',
-            'closeWindow',
-            'getNetworkType',
-            'openEnterpriseChat',
-            'scanQRCode',
-            'openLocation',
-            'getLocation',
-            'hideOptionMenu'
-          ]
-				});
-				
-				wx.ready(function(){
-					wx.hideMenuItems({
-						menuList: ["menuItem:share:appMessage","menuItem:share:timeline","menuItem:share:qq","menuItem:share:QZone","menuItem:share:weiboApp","menuItem:favorite","menuItem:share:facebook","menuItem:share:QZone","menuItem:copyUrl","menuItem:share:email"]
-					});
-				});
-			});
-}
-
 
 //获取url全路径
 function getAllPath(urlHash){
@@ -135,7 +90,7 @@ function getScrollHighWithOther(hasSearch,hasTopTab,hasBottomTab,otherHeight){
   if(isAndroid==true){
     winHeight = window.screen.height-64-high+"px"; //-46
   }else if(isiOS==true){
-     winHeight = window.screen.availHeight-high+"px"; //如果在chrome测试，要把这个-56去掉，因为这是假的ios
+     winHeight = window.screen.availHeight-56-high+"px"; //如果在chrome测试，要把这个-56去掉，因为这是假的ios
   }
   return winHeight;
 }

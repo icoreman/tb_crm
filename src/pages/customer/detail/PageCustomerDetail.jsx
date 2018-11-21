@@ -68,10 +68,11 @@ export default class PageCustomerDetail extends Component {
         var firstTableHeight = getScrollHighWithOther(0, 0, 0, (42 + 71));
         var tableHeight = getScrollHighWithOther(0, 0, 0, otherLength);
         var tableWith = getWidth();
-        var token = document.getElementById("token").value;
+        var token = localStorage.token;
         t.state = {
           token: token,
           custId: id,
+          custName: '',
           custEdit: custEdit,
           showAddButton: showAddButton,
           baseInfo: {
@@ -168,7 +169,7 @@ export default class PageCustomerDetail extends Component {
             currentPage:1,
             chanId:null,
             noClose: null,
-            noGroup: null,
+            noGroup: 'no',
             noValue: null,
             idall: null,
             chanNew: null,
@@ -178,8 +179,8 @@ export default class PageCustomerDetail extends Component {
             chanType: null,
             chanNames: null,
             saveType: null,
-            order: null,
-            orderBy: null,
+            order: 'desc',
+            orderBy: 'createdDate',
           },
           questions : {
             pageSize: 15,
@@ -234,6 +235,7 @@ export default class PageCustomerDetail extends Component {
         .then((content) => {
           this.setState({
               baseInfo: content,
+              custName: content.custName
           });
 
           var custCenter = content.custCenter; 
@@ -269,8 +271,9 @@ export default class PageCustomerDetail extends Component {
       });
     }
 
-    handleEditClick() {
-      hashHistory.push('/customer/add');
+    handleEditClick = () => {
+      let custId = this.state.custId;
+      hashHistory.push('/customer/edit?custId=' + custId);
     }
 
     handleChange(label, value) {
@@ -309,33 +312,34 @@ export default class PageCustomerDetail extends Component {
       return data;
     }
 
-    handleLinkClick(custId, id, type) {   
-      hashHistory.push('/link/form?custId=' + custId + '&id=' + id + '&type=' + type);
+    handleLinkClick(custId, custName, id, type) {   
+      hashHistory.push('/link/form?custId=' + custId + '&custName=' + custName + '&id=' + id + '&type=' + type);
     }
 
-    handleChanceClick(custId, id, type) {
-      hashHistory.push('/chance/form?custId=' + custId + '&id=' + id + '&type=' + type);
+    handleChanceClick(custId, custName, id, type) {
+      hashHistory.push('/chance/form?custId=' + custId + '&custName=' + custName + '&id=' + id + '&type=' + type);
     }
 
-    handleQuestionClick(custId, id, type) {
-      hashHistory.push('/question/form?custId=' + custId + '&id=' + id + '&type=' + type);
+    handleQuestionClick(custId, custName, id, type) {
+      hashHistory.push('/question/form?custId=' + custId + '&custName=' + custName + '&id=' + id + '&type=' + type);
     }
 
     beforeFetchQues(data, from) {
+      let questions = this.state.questions;
       data.token = this.state.token;
-      data.quesId = this.state.questions.quesId;
-      data.order = this.state.questions.order;
-      data.orderBy = this.state.questions.orderBy;
-      data.idall = this.state.questions.idall;
-      data.noClose = this.state.questions.noClose;
-      data.noGroup = this.state.questions.noGroup;
-      data.noValue = this.state.questions.noValue;
-      data.quesNew = this.state.questions.quesNew;
-      data.quesCenter = this.state.questions.quesCenter;
+      data.quesId = questions.quesId;
+      data.order = questions.order;
+      data.orderBy = questions.orderBy;
+      data.idall = questions.idall;
+      data.noClose = questions.noClose;
+      data.noGroup = questions.noGroup;
+      data.noValue = questions.noValue;
+      data.quesNew = questions.quesNew;
+      data.quesCenter = questions.quesCenter;
       data.quesCustName = this.state.custId;
-      data.quesState = this.state.questions.quesState;
-      data.quesDescs = this.state.questions.saveType;
-      data.saveType = this.state.questions.orderBy;
+      data.quesState = questions.quesState;
+      data.quesDescs = questions.saveType;
+      data.saveType = questions.orderBy;
   
       return data;
     }
@@ -361,143 +365,145 @@ export default class PageCustomerDetail extends Component {
     }
 
     render() {
-        let t = this;
-        let firstTableViewStyle = {'height': t.state.firstTableHeight,'overflowX': 'hidden'};
-        let otherTableViewStyle = {'height': t.state.tableHeight,'overflowX': 'hidden'};
+        const t = this;
+        const firstTableViewStyle = {'height': t.state.firstTableHeight,'overflowX': 'hidden'};
+        const otherTableViewStyle = {'height': t.state.tableHeight,'overflowX': 'hidden'};
+        const custName = t.state.baseInfo.custName;
+
         return (
-            <div className="t-FS16">
-              <div>
-                <Card mode="full" className="card-sence">
-                  <div className="t-card-header">
-                    <span className="card-custName">{ t.state.baseInfo.custName }  </span>
-                    <span className="card-custCategory">{ t.state.baseInfo.custCategory }</span>
-                  </div>
-                  <div className="card-footer">
-                    <div className="card-footer-meta">
-                      <span className="card-footer-meta-item">
-                        未更新天数：
-                        <span className="card-eye-count"></span>
-                      </span>
-                    </div>
-                    <div className="card-footer-extra">{ t.state.baseInfo.custStage }</div>
-                  </div>
-                </Card>
-                <Tab active={'0'}>  
-                  <Tab.Item title="基本信息"> 
-                    <div style={ firstTableViewStyle }> 
-                      <Group>   
-                        <Group.List lineIndent={18} className="content-FAR t-FS16">
-                          <TextField  readOnly label="客户名称"  value={ t.state.baseInfo.custName }/>
-                        </Group.List>
-                        <div className="t-MB3"></div>
-                        <Group.List lineIndent={18} className="content-FAR t-FS16">
-                          <TextField label="客户简称" readOnly  value={ t.state.baseInfo.custSimpleName }/>
-                        </Group.List>
-                        <div className="t-MB3"></div>
-                        <Group.List lineIndent={18} className="content-FAR t-FS16">
-                          <TextField label="行业地位" readOnly  value={ t.state.baseInfo.custIndustryStatus } />
-                        </Group.List>
-                        <div className="t-MB3"></div>  
-                        <Group.List lineIndent={18} className="content-FAR t-FS16">
-                          <TextField label="客户阶段" readOnly  value={ t.state.baseInfo.custStage } />
-                        </Group.List>
-                        <div className="t-MB3"></div>
-                        <Group.List lineIndent={18} className="content-FAR t-FS16">
-                          <TextField label="产品中心" readOnly  value={ t.state.centerName } >
-                          <RightAddon>
-                            <span></span>
-                          </RightAddon>
-                          </TextField>
-                        </Group.List>
-                        <div className="t-MB3"></div>
-                        <Group.List lineIndent={18} className="content-FAR t-FS16">
-                          <TextField label="客户来源" readOnly  value={ t.state.baseInfo.custSource } />
-                        </Group.List>
-                        <div className="t-MB3"></div>
-                        <Group.List lineIndent={18} className="content-FAR t-FS16">
-                          <TextField label="上年度营收（万元）" readOnly  value={ t.state.baseInfo.custIncomeLast } />
-                        </Group.List>
-                        <div className="t-MB3"></div>
-                        <Group.List lineIndent={18} className="content-FAR t-FS16">
-                          <TextField label="主营业务" readOnly  value={ t.state.baseInfo.custMainBusiness } />
-                        </Group.List>
-                        <div className="t-MB3"></div>
-                        <Group.List lineIndent={18} className="content-FAR t-FS16">
-                          <TextField label="公司地址" readOnly  value={ t.state.baseInfo.custAddress } />
-                        </Group.List>
-                        <div className="t-MB3"></div>
-                        <Group.List lineIndent={18} className="content-FAR t-FS16">
-                          <TextField label="销售人员" readOnly  value={ t.state.baseInfo.custSalesman } />
-                        </Group.List>
-                      </Group> 
-                    </div> 
-                    <LogicRender show={ t.state.showAddButton }>
-                     <Button key="cust-edt" className="t-tabs-button" type="primary" display="inline-block" onClick={t.handleEditClick.bind(t)}>编    辑</Button>
-                    </LogicRender>
-                  </Tab.Item>
-                  <Tab.Item title="联系人" >
-                    <div  style={ otherTableViewStyle }>
-                      <ScrollList
-                        url={ URLS.link.list }
-                        dataType="json"
-                        pageSize={ t.state.links.pageSize }
-                        ref = 'cust_link_ref'
-                        noDataImage={noDataImage}
-                        beforeFetch ={ t.beforeFetchLinks.bind(t)}
-                        currentPage={ t.state.links.currentPage }
-                      >          
-                        <CustLinkListItem
-                          showEditButton={ t.state.showAddButton } 
-                          clickItem={ t.handleLinkClick }/>
-                      </ScrollList>
-                    </div>
-                    <LogicRender show={ t.state.showAddButton } >
-                      <Button key="link-add" className="t-tabs-button-link-add" type="primary" display="inline-block" onClick={ t.handleLinkClick.bind(this,t.state.custId,'','create') }>新建联系人</Button>
-                    </LogicRender>
-                  </Tab.Item>
-                  <Tab.Item title="商机" >
-                    <div style={ otherTableViewStyle }>
-                      <ScrollList
-                        url={ URLS.chance.list }
-                        dataType="json"
-                        pageSize={ t.state.chances.pageSize }
-                        ref = 'cust_chance_ref'
-                        noDataImage={noDataImage}
-                        beforeFetch ={ t.beforeFetchChance.bind(t)}
-                        currentPage={ t.state.chances.currentPage }
-                      >          
-                        <CustChanceListItem 
-                        showEditButton={ t.state.showAddButton }
-                        clickItem={ t.handleChanceClick }/>
-                      </ScrollList>
-                    </div>
-                    <LogicRender show={ t.state.showAddButton }>
-                      <Button key="chance-add" className="t-tabs-button-chance-add" type="primary" display="inline-block" onClick={ t.handleChanceClick.bind(this, t.state.custId, '', 'create') }>新建商机</Button>
-                    </LogicRender>
-                  </Tab.Item>
-                  <Tab.Item title="问题" >
-                    <div style={ otherTableViewStyle }>
-                      <ScrollList
-                        url={ URLS.question.list }
-                        dataType="json"
-                        pageSize={ t.state.links.pageSize }
-                        ref = 'cust_ques_ref'
-                        noDataImage={noDataImage}
-                        beforeFetch ={ t.beforeFetchQues.bind(t)}
-                        currentPage={ t.state.links.currentPage }
-                      >          
-                        <CustQuesListItem 
-                          showEditButton= { t.state.showAddButton }
-                          clickItem= { t.handleQuestionClick }/>
-                      </ScrollList>
-                    </div>
-                    <LogicRender show={ t.state.showAddButton }>
-                      <Button key="ques-add" className="t-tabs-button-ques-add" type="primary" display="inline-block" onClick={t.handleQuestionClick.bind(this,t.state.custId, '', 'create')}>新建问题</Button>
-                    </LogicRender>
-                  </Tab.Item>  
-                </Tab>
-              </div>  
-            </div>
+          <div>
+            <Card mode="full" className="card-sence">
+              <div className="t-card-header t-MT3">
+                <span className="card-custName">{ custName }  </span>
+              </div>
+              <div className="card-footer">
+                <div className="card-footer-meta">
+                  <span className="card-footer-meta-item">
+                   { t.state.baseInfo.custCategory }
+                  </span>
+                </div>
+                <div className="card-footer-extra">{ t.state.baseInfo.custStage }</div>
+              </div>
+            </Card>
+            <Tab activeKey={'0'}>  
+              <Tab.Item title="基本信息"> 
+                <div style={ firstTableViewStyle }> 
+                  <Group>   
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField  readOnly label="客户名称"  value={ custName }/>
+                    </Group.List>
+                    <div className="t-MB3"></div>
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="客户简称" readOnly  value={ t.state.baseInfo.custAbbreviation }/>
+                    </Group.List>
+                    <div className="t-MB3"></div>
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="行业地位" readOnly  value={ t.state.baseInfo.custIndustryStatus } />
+                    </Group.List>
+                    <div className="t-MB3"></div>  
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="客户阶段" readOnly  value={ t.state.baseInfo.custStage } />
+                    </Group.List>
+                    <div className="t-MB3"></div>
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="产品中心" readOnly  value={ t.state.centerName } >
+                      <RightAddon>
+                        <span></span>
+                      </RightAddon>
+                      </TextField>
+                    </Group.List>
+                    <div className="t-MB3"></div>
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="客户来源" readOnly  value={ t.state.baseInfo.custSource } />
+                    </Group.List>
+                    <div className="t-MB3"></div>
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="上年度营收（万元）" readOnly  value={ t.state.baseInfo.custIncomeLast } />
+                    </Group.List>
+                    <div className="t-MB3"></div>
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="年PCBA采购规模（万元）" readOnly  value={ t.state.baseInfo.custDemandNum } />
+                    </Group.List>
+                    <div className="t-MB3"></div>
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="主营业务" readOnly  value={ t.state.baseInfo.custMainBusiness } />
+                    </Group.List>
+                    <div className="t-MB3"></div>
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="公司地址" readOnly  value={ t.state.baseInfo.custAddress } />
+                    </Group.List>
+                    <div className="t-MB3"></div>
+                    <Group.List lineIndent={18} className="content-FAR t-FS16">
+                      <TextField label="销售人员" readOnly  value={ t.state.baseInfo.createdUserName } />
+                    </Group.List>
+                  </Group> 
+                </div> 
+                <LogicRender show={ t.state.showAddButton }>
+                 <Button key="cust-edt" className="t-tabs-button" type="primary" display="inline-block" onClick={t.handleEditClick.bind(t)}>编    辑</Button>
+                </LogicRender>
+              </Tab.Item>
+              <Tab.Item title="联系人" >
+                <div  style={ otherTableViewStyle }>
+                  <ScrollList
+                    url={ URLS.link.list }
+                    dataType="json"
+                    pageSize={ t.state.links.pageSize }
+                    ref = 'cust_link_ref'
+                    noDataImage={noDataImage}
+                    beforeFetch ={ t.beforeFetchLinks.bind(t)}
+                    currentPage={ t.state.links.currentPage }
+                  >          
+                    <CustLinkListItem
+                      showEditButton={ t.state.showAddButton } 
+                      clickItem={ (custId, id ,type) => t.handleLinkClick(custId, custName, id ,type) }/>
+                  </ScrollList>
+                </div>
+                <LogicRender show={ t.state.showAddButton } >
+                  <Button key="link-add" className="t-tabs-button-link-add" type="primary" display="inline-block" onClick={ t.handleLinkClick.bind(t, t.state.custId, custName, '', 'create') }>新建联系人</Button>
+                </LogicRender>
+              </Tab.Item>
+              <Tab.Item title="商机" >
+                <div style={ otherTableViewStyle }>
+                  <ScrollList
+                    url={ URLS.chance.list }
+                    dataType="json"
+                    pageSize={ t.state.chances.pageSize }
+                    ref = 'cust_chance_ref'
+                    noDataImage={noDataImage}
+                    beforeFetch ={ t.beforeFetchChance.bind(t)}
+                    currentPage={ t.state.chances.currentPage }
+                  >          
+                    <CustChanceListItem 
+                    showEditButton={ t.state.showAddButton }
+                    clickItem={ t.handleChanceClick } />
+                  </ScrollList>
+                </div>
+                <LogicRender show={ t.state.showAddButton }>
+                  <Button key="chance-add" className="t-tabs-button-chance-add" type="primary" display="inline-block" onClick={ t.handleChanceClick.bind(t, t.state.custId, custName, '', 'create') }>新建商机</Button>
+                </LogicRender>
+              </Tab.Item>
+              <Tab.Item title="问题" >
+                <div style={ otherTableViewStyle }>
+                  <ScrollList
+                    url={ URLS.question.list }
+                    dataType="json"
+                    pageSize={ t.state.links.pageSize }
+                    ref = 'cust_ques_ref'
+                    noDataImage={noDataImage}
+                    beforeFetch ={ t.beforeFetchQues.bind(t)}
+                    currentPage={ t.state.links.currentPage }
+                  >          
+                    <CustQuesListItem 
+                      showEditButton= { t.state.showAddButton }
+                      clickItem= { t.handleQuestionClick }/>
+                  </ScrollList>
+                </div>
+                <LogicRender show={ t.state.showAddButton }>
+                  <Button key="ques-add" className="t-tabs-button-ques-add" type="primary" display="inline-block" onClick={t.handleQuestionClick.bind(t, t.state.custId, custName, '', 'create')}>新建问题</Button>
+                </LogicRender>
+              </Tab.Item>  
+            </Tab>
+          </div>
         )
     }
 }

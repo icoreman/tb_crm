@@ -16,8 +16,8 @@ export default class CustManageListItem extends Component {
     this.props.handleClickItem(id,edit);
   }
 
-  handleClickItemPlus(id) {
-    this.props.handleClickItemPlus(id);
+  handleClickItemPlus(id, custName) {
+    this.props.handleClickItemPlus(id, custName);
   }
  
   render()  {
@@ -41,7 +41,7 @@ export default class CustManageListItem extends Component {
               </HBox>
             </VBox>
             <VBox className="t-list-title-date t-PR10" hAlign="center" >
-              <Plus fill={'#42A5F5'} onClick={ t.handleClickItemPlus.bind(this,data.id) }/>
+              <Plus fill={'#42A5F5'} onClick={ t.handleClickItemPlus.bind(this,data.id, data.custName) }/>
             </VBox>
           </HBox>
         </Group.List>
