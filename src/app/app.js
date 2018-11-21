@@ -51,8 +51,8 @@ Refast.use('fn', {
   history: history,
 });
 
-const Loading = () => { return <div className="kuma-loading" ></div> };
 const Empty = () => { return <div>暂无数据</div> };
+const Loading = () => { return <div className="kuma-loading"></div> };
 
 // 修改 LogicRender 增加默认配置
 // 用来自定义Loading和Empty的样式

@@ -1,8 +1,8 @@
 // 这里放置全局的变量
-const isDev = true;
+const isDev = false;
 //const context = 'http://crm.topband.com.cn:18081/flexoffice/';
-const context = 'http://192.168.8.98:8080/flexoffice/';
-//const context = 'http://crm.topband.com.cn:18681/flexoffice/';
+//const context = 'http://192.168.8.98:8080/flexoffice/';
+const context = 'http://crm.topband.com.cn:18681/flexoffice/';
 
 const crmPrefix = 'api/tb/crm/';
 const commonPrefix = 'api/tb/crm/common/';//

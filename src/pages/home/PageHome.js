@@ -13,6 +13,7 @@ import { hashHistory } from 'react-router';
 
 import HomeTabPopView from 'components/HomeTabPopView';
 import Upload from 'components/upload';
+import TravelListItem from 'pages/travel/list_item';
 
 import './PageHome.less';
 
@@ -151,7 +152,7 @@ export default class PageHome extends Component {
     });
   }
 
-  beforeFetch = () => {
+  beforeFetch = (data, from) => {
     data.token = localStorage.token;
 
     return data;
@@ -240,7 +241,16 @@ export default class PageHome extends Component {
               </ScrollView>
             </Tab.Item>
             <Tab.Item title="出差清单" >
-             
+              <ScrollList
+                url={ URLS.travel.list }
+                dataType="json"
+                pageSize={ 10 }
+                ref = 'travel_lit_ref'
+                beforeFetch ={ t.beforeFetch }
+              >      
+                <TravelListItem 
+                  handleClickItem= { t.handleClickItem }/>
+              </ScrollList>
             </Tab.Item>
           </Tab>
         </div>

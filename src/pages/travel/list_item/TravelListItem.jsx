@@ -1,7 +1,7 @@
-import { Component,LogicRender } from 'refast';
+import { Component } from 'refast';
 import {
-    Boxs
-} from 'saltui';
+  Boxs
+} from 'saltui/lib/Boxs';
 
 import {
   Form,

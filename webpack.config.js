@@ -34,7 +34,7 @@ module.exports = function webpackConfig(config, webpack) {
         delete n.include;
       } else if (/\.jsx?$/.toString() === n.test.toString()) {
         n.query.plugins.push(['import', { libraryName: 'saltui', camel2UnderlineComponentName: false, camel2DashComponentName: false }]);
-      }
+      } 
     });
   }
 };
